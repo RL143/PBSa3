@@ -71,7 +71,7 @@ int main(void)
         step++;
         time += parameters.dt;
         Ekin = update_velocities_half_dt(&parameters, &nbrlist, &vectors);
-        thermostat(&parameters, &vectors, Ekin);
+        //thermostat(&parameters, &vectors, Ekin);
         update_positions(&parameters, &nbrlist, &vectors);
         boundary_conditions(&parameters, &vectors);
         update_nbrlist(&parameters, &vectors, &nbrlist);

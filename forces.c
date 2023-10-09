@@ -129,7 +129,7 @@ double calculate_forces_nb(struct Parameters *p_parameters, struct Nbrlist *p_nb
 This function returns the total potential energy of the system. */
 {
     struct Vec3D df;
-    double r_cutsq, sigmasq, sr2, sr6, sr12, fr, prefctr;
+    double r_cutsq, sigmasq, sr2, sr6, sr12, fr, prefctr, aij;
     struct DeltaR rij;
     struct Pair *nbr = p_nbrlist->nbr;
     const size_t num_nbrs = p_nbrlist->num_nbrs;
@@ -155,21 +155,24 @@ This function returns the total potential energy of the system. */
         if (rij.sq < r_cutsq)
         // Compute forces if the distance is smaller than the cutoff distance
         {
-            // pair forces are given by the LJ interaction
-            sr2 = sigmasq / rij.sq;
-            sr6 = sr2 * sr2 * sr2;
-            sr12 = sr6 * sr6;
-            Epot += 4.0 * epsilon * (sr12 - sr6 - Epot_cutoff);
-            fr = 24.0 * epsilon * (2.0 * sr12 - sr6) / rij.sq; //force divided by distance
-            df.x = fr * rij.x;
-            df.y = fr * rij.y;
-            df.z = fr * rij.z;
+            //Load maximum repulsion parameter
+            aij= p_parameters->aij;
+            
+            //Calculate conservative force in the x,y and z directions
+            df.x= aij*(1-sqrt(rij.sq))* rij.x/sqrt(rij.sq);
+            df.y= aij*(1-sqrt(rij.sq))* rij.y/sqrt(rij.sq);
+            df.z= aij*(1-sqrt(rij.sq))* rij.z/sqrt(rij.sq);
+            
+            //Add to overall forces
             f[i].x += df.x;
             f[i].y += df.y;
             f[i].z += df.z;
             f[j].x -= df.x;
             f[j].y -= df.y;
             f[j].z -= df.z;
+
+            //Calculate contribution to potential energy
+            Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq + aij/2;
         }
     }
 

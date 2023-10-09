@@ -24,6 +24,7 @@ void set_parameters(struct Parameters *p_parameters)
     p_parameters->r_cut = 2.5;                              //cut-off distance used for neigbor list
   p_parameters->r_shell = 0.4;                              //shell thickness for neighbor list
   p_parameters->num_dt_pdb = 500;                           //number of time steps in between pdb outputs
+  p_parameters->aij = 25;
   strcpy(p_parameters->filename_pdb, "trajectories");       //filename (without extension) for pdb file
   p_parameters->rescale_output = 1;                         //factor used to rescale output lengthscale (Most visualisation programs identify bonds based on distances of order 1)
   p_parameters->load_restart = 0;                           //if equal 1 restart file is loaded

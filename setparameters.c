@@ -30,7 +30,7 @@ void set_parameters(struct Parameters *p_parameters)
   strcpy(p_parameters->restart_in_filename, "restart.dat"); //filename for loaded restart file
   p_parameters->num_dt_restart = 1000;                      // number of time steps between saves
   strcpy(p_parameters->restart_out_filename, "restart.dat");//filename for saved restart file
-// 
+
 
   if (p_parameters->r_cut > p_parameters->L.x / 2.0)
     fprintf(stderr, "Warning! r_cut > Lx/2");

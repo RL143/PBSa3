@@ -30,7 +30,7 @@ double update_velocities_half_dt(struct Parameters *p_parameters, struct Nbrlist
 */
 {
     double Ekin = 0.0;
-    const double factor = 0.5 * p_parameters->dt;/// p_parameters->mass * p_parameters->dt;
+    const double factor = 0.5 * p_parameters->mass * p_parameters->dt;
     for (size_t i = 0; i < p_parameters->num_part; i++)
     {
         p_vectors->v[i].x += factor * p_vectors->f[i].x;

@@ -140,11 +140,11 @@ This function returns the total potential energy of the system. */
     sigmasq = p_parameters->sigma * p_parameters->sigma;
     double epsilon = p_parameters->epsilon;
 
-    double Epot = 0.0, Epot_cutoff;
-    sr2 = sigmasq / r_cutsq;
-    sr6 = sr2 * sr2 * sr2;
-    sr12 = sr6 * sr6;
-    Epot_cutoff = sr12 - sr6;
+    double Epot = 0.0;//, Epot_cutoff;
+    //sr2 = sigmasq / r_cutsq;
+    //sr6 = sr2 * sr2 * sr2;
+    //sr12 = sr6 * sr6;
+    //Epot_cutoff = sr12 - sr6;
 
     for (size_t k = 0; k < num_nbrs; k++)
     {
@@ -156,12 +156,12 @@ This function returns the total potential energy of the system. */
         // Compute forces if the distance is smaller than the cutoff distance
         {
             //Load maximum repulsion parameter
-            aij= p_parameters->aij;
+            aij = p_parameters->aij;
             
             //Calculate conservative force in the x,y and z directions
-            df.x= aij*(1-sqrt(rij.sq))* rij.x/sqrt(rij.sq);
-            df.y= aij*(1-sqrt(rij.sq))* rij.y/sqrt(rij.sq);
-            df.z= aij*(1-sqrt(rij.sq))* rij.z/sqrt(rij.sq);
+            df.x = aij*(1-sqrt(rij.sq))* rij.x/sqrt(rij.sq);
+            df.y = aij*(1-sqrt(rij.sq))* rij.y/sqrt(rij.sq);
+            df.z = aij*(1-sqrt(rij.sq))* rij.z/sqrt(rij.sq);
             
             //Add to overall forces
             f[i].x += df.x;

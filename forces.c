@@ -162,9 +162,9 @@ This function returns the total potential energy of the system. */
             Fr= aij*(1-sqrt(rij.sq))/sqrt(rij.sq);
 
             //Calculate conservative force in the x,y and z directions
-            fC.x = aij*(1-sqrt(rij.sq))* rij.x/sqrt(rij.sq);
-            fC.y = aij*(1-sqrt(rij.sq))* rij.y/sqrt(rij.sq);
-            fC.z = aij*(1-sqrt(rij.sq))* rij.z/sqrt(rij.sq);
+            fC.x = Fr* rij.x;
+            fC.y = Fr* rij.y;
+            fC.z = Fr* rij.z;
             
             //Calculate the dissipative force in the x,y and z directions
             fD.x = -p_parameters->gamma*(1-rij.sq)*sqrt(rij.sq)*(rij.x/sqrt(rij.sq)*(p_vectors->v[i].x-p_vectors->v[j].x))*(rij.x/sqrt(rij.sq));
@@ -189,12 +189,12 @@ This function returns the total potential energy of the system. */
         }
             
         //Add to overall forces
-        f[i].x += fC.x + fD.x; //+ fR.x;
-        f[i].y += fC.y + fD.y;  //+ fR.y;
-        f[i].z += fC.z; + fD.z;  //+ fR.z;
-        f[j].x -= fC.x; + fD.x;   //+ fR.x;
-        f[j].y -= fC.y; + fD.y;   //+ fR.y;
-        f[j].z -= fC.z; + fD.z;   //+ fR.z;
+        f[i].x += fC.x;// + fD.x; //+ fR.x;
+        f[i].y += fC.y;// + fD.y;  //+ fR.y;
+        f[i].z += fC.z;// + fD.z;  //+ fR.z;
+        f[j].x -= fC.x;// + fD.x;   //+ fR.x;
+        f[j].y -= fC.y;// + fD.y;   //+ fR.y;
+        f[j].z -= fC.z;// + fD.z;   //+ fR.z;
 
         //Calculate contribution to potential energy
         Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq - aij/2;

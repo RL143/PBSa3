@@ -129,7 +129,7 @@ double calculate_forces_nb(struct Parameters *p_parameters, struct Nbrlist *p_nb
 This function returns the total potential energy of the system. */
 {
     struct Vec3D fC, fD, fR;
-    double r_cutsq, sigmasq, sr2, sr6, sr12, fr, prefctr, aij;
+    double r_cutsq, sigmasq, sr2, sr6, sr12, fr, prefctr, aij, Fr;
     struct DeltaR rij;
     struct Pair *nbr = p_nbrlist->nbr;
     const size_t num_nbrs = p_nbrlist->num_nbrs;
@@ -158,6 +158,9 @@ This function returns the total potential energy of the system. */
             //Load maximum repulsion parameter
             aij = p_parameters->aij;
             
+            //Storing reoccuring calculations in double
+            Fr= aij*(1-sqrt(rij.sq))/sqrt(rij.sq);
+
             //Calculate conservative force in the x,y and z directions
             fC.x = aij*(1-sqrt(rij.sq))* rij.x/sqrt(rij.sq);
             fC.y = aij*(1-sqrt(rij.sq))* rij.y/sqrt(rij.sq);

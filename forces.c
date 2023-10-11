@@ -168,15 +168,17 @@ This function returns the total potential energy of the system. */
             fC.z = Fr* rij.z;
             
             //Calculate the dissipative force in the x,y and z directions
-            fD.x = -p_parameters->gamma*(1-rij.sq)*sqrt(rij.sq)*(rij.x/sqrt(rij.sq)*(p_vectors->v[i].x-p_vectors->v[j].x))*(rij.x/sqrt(rij.sq));
-            fD.y = -p_parameters->gamma*(1-rij.sq)*sqrt(rij.sq)*(rij.y/sqrt(rij.sq)*(p_vectors->v[i].y-p_vectors->v[j].y))*(rij.y/sqrt(rij.sq));
-            fD.z = -p_parameters->gamma*(1-rij.sq)*sqrt(rij.sq)*(rij.z/sqrt(rij.sq)*(p_vectors->v[i].z-p_vectors->v[j].z))*(rij.z/sqrt(rij.sq));
+            fD.x = -p_parameters->gamma*pow(1-sqrt(rij.sq),2)*(rij.x/sqrt(rij.sq)*(p_vectors->v[i].x-p_vectors->v[j].x))*(rij.x/sqrt(rij.sq));
+            fD.y = -p_parameters->gamma*pow(1-sqrt(rij.sq),2)*(rij.y/sqrt(rij.sq)*(p_vectors->v[i].y-p_vectors->v[j].y))*(rij.y/sqrt(rij.sq));
+            fD.z = -p_parameters->gamma*pow(1-sqrt(rij.sq),2)*(rij.z/sqrt(rij.sq)*(p_vectors->v[i].z-p_vectors->v[j].z))*(rij.z/sqrt(rij.sq));
 
             //Calculate the random force in the x,y and z directions
-            double factor = p_parameters->sigma*sqrt(1-rij.sq)*sqrt(rij.sq)*generate_uniform_random();
+            double factor = p_parameters->sigma*sqrt(1-sqrt(rij.sq))*pow(p_parameters->dt,-0.5)*generate_uniform_random();
             fR.x = factor*(rij.x/sqrt(rij.sq));
             fR.y = factor*(rij.y/sqrt(rij.sq));
             fR.z = factor*(rij.z/sqrt(rij.sq));
+
+            Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq - aij/2;
         }
 
        else
@@ -201,7 +203,7 @@ This function returns the total potential energy of the system. */
         f[j].z -= fC.z;// + fD.z;   //+ fR.z;
 
         //Calculate contribution to potential energy
-        Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq - aij/2;
+        //Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq - aij/2;
 
     }
     return Epot;

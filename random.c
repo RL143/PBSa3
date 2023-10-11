@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 double generate_uniform_random(void)
 /* Generate a uniform random number between 0 and 1, inclusive */
 /* Note: this is NOT the best random number out there, but it's quick and simple */
 {
   double r;
-  r = (double)rand() / (double)RAND_MAX;
-  return r;
+  r = 2*sqrt(3) * ((double)rand() / (double)RAND_MAX -.5);
+ return r;
 }
 
 double gauss(void)

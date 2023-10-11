@@ -172,7 +172,10 @@ This function returns the total potential energy of the system. */
             fD.z = -p_parameters->gamma*(1-rij.sq)*sqrt(rij.sq)*(rij.z/sqrt(rij.sq)*(p_vectors->v[i].z-p_vectors->v[j].z))*(rij.z/sqrt(rij.sq));
 
             //Calculate the random force in the x,y and z directions
-            //df_r.x = p_parameters->sigma*sqrt(1-rij.sq)*sqrt(rij.sq)*(rij.x/sqrt(rij.sq));
+            double factor = p_parameters->sigma*sqrt(1-rij.sq)*sqrt(rij.sq)*generate_uniform_random();
+            fR.x = factor*(rij.x/sqrt(rij.sq));
+            fR.y = factor*(rij.y/sqrt(rij.sq));
+            fR.z = factor*(rij.z/sqrt(rij.sq));
         }
 
        else

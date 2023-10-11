@@ -128,7 +128,7 @@ double calculate_forces_nb(struct Parameters *p_parameters, struct Nbrlist *p_nb
 /* Compute non-bonded forces on particles using the pairs in a neighbor list.
 This function returns the total potential energy of the system. */
 {
-    struct Vec3D df;
+    struct Vec3D fC, fD, fR;
     double r_cutsq, sigmasq, sr2, sr6, sr12, fr, prefctr, aij;
     struct DeltaR rij;
     struct Pair *nbr = p_nbrlist->nbr;
@@ -152,29 +152,50 @@ This function returns the total potential energy of the system. */
         rij = nbr[k].rij;
         size_t i = nbr[k].i;
         size_t j = nbr[k].j;
-        if (sqrt(rij.sq) < r_cutsq)
+        if (rij.sq < r_cutsq)
         // Compute forces if the distance is smaller than the cutoff distance
         {
             //Load maximum repulsion parameter
             aij = p_parameters->aij;
             
             //Calculate conservative force in the x,y and z directions
-            df.x = aij*(1-sqrt(rij.sq))* rij.x/sqrt(rij.sq);
-            df.y = aij*(1-sqrt(rij.sq))* rij.y/sqrt(rij.sq);
-            df.z = aij*(1-sqrt(rij.sq))* rij.z/sqrt(rij.sq);
+            fC.x = aij*(1-sqrt(rij.sq))* rij.x/sqrt(rij.sq);
+            fC.y = aij*(1-sqrt(rij.sq))* rij.y/sqrt(rij.sq);
+            fC.z = aij*(1-sqrt(rij.sq))* rij.z/sqrt(rij.sq);
             
-            //Add to overall forces
-            f[i].x += df.x;
-            f[i].y += df.y;
-            f[i].z += df.z;
-            f[j].x -= df.x;
-            f[j].y -= df.y;
-            f[j].z -= df.z;
+            //Calculate the dissipative force in the x,y and z directions
+            fD.x = -p_parameters->gamma*(1-rij.sq)*sqrt(rij.sq)*(rij.x/sqrt(rij.sq)*(p_vectors->v[i].x-p_vectors->v[j].x))*(rij.x/sqrt(rij.sq));
+            fD.y = -p_parameters->gamma*(1-rij.sq)*sqrt(rij.sq)*(rij.y/sqrt(rij.sq)*(p_vectors->v[i].y-p_vectors->v[j].y))*(rij.y/sqrt(rij.sq));
+            fD.z = -p_parameters->gamma*(1-rij.sq)*sqrt(rij.sq)*(rij.z/sqrt(rij.sq)*(p_vectors->v[i].z-p_vectors->v[j].z))*(rij.z/sqrt(rij.sq));
 
-            //Calculate contribution to potential energy
-            Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq + aij/2;
+            //Calculate the random force in the x,y and z directions
+            //df_r.x = p_parameters->sigma*sqrt(1-rij.sq)*sqrt(rij.sq)*(rij.x/sqrt(rij.sq));
         }
-    }
 
+       else
+       {
+            fC.x = 0;
+            fC.y = 0;
+            fC.z = 0;
+            fD.x = 0;
+            fD.y = 0;
+            fD.z = 0;
+            //fR.x = 0;
+            //fR.y = 0;
+            //fR.z = 0;
+        }
+            
+        //Add to overall forces
+        f[i].x += fC.x + fD.x; //+ fR.x;
+        f[i].y += fC.y + fD.y;  //+ fR.y;
+        f[i].z += fC.z; + fD.z;  //+ fR.z;
+        f[j].x -= fC.x; + fD.x;   //+ fR.x;
+        f[j].y -= fC.y; + fD.y;   //+ fR.y;
+        f[j].z -= fC.z; + fD.z;   //+ fR.z;
+
+        //Calculate contribution to potential energy
+        Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq - aij/2;
+
+    }
     return Epot;
 }

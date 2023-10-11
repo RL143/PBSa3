@@ -12,7 +12,7 @@ void set_parameters(struct Parameters *p_parameters)
   p_parameters->kT = 1.0;                                   //thermal energy
   p_parameters->mass = 1.0;                                 //mass of a particle
   p_parameters->epsilon = 1.0;                              //LJ interaction strength
-  p_parameters->sigma = 1.0;                                //LJ particle diameter
+  //p_parameters->sigma = 1.0;                                //LJ particle diameter
 
 // The parameters below control core functionalities of the code, but many values will need to be changed
   p_parameters->num_part = 2000;                            //number of particles
@@ -25,6 +25,8 @@ void set_parameters(struct Parameters *p_parameters)
   p_parameters->r_shell = 0.4;                              //shell thickness for neighbor list
   p_parameters->num_dt_pdb = 500;                           //number of time steps in between pdb outputs
   p_parameters->aij = 25;
+  p_parameters->gamma = 4.5;
+  p_parameters->sigma = 3.0;
   strcpy(p_parameters->filename_pdb, "trajectories");       //filename (without extension) for pdb file
   p_parameters->rescale_output = 1;                         //factor used to rescale output lengthscale (Most visualisation programs identify bonds based on distances of order 1)
   p_parameters->load_restart = 0;                           //if equal 1 restart file is loaded

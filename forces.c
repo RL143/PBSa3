@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "structs.h"
 #include "nbrlist.h"
+#include "random.h"
 
 double calculate_forces(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 {
@@ -186,9 +187,9 @@ This function returns the total potential energy of the system. */
             fD.x = 0;
             fD.y = 0;
             fD.z = 0;
-            //fR.x = 0;
-            //fR.y = 0;
-            //fR.z = 0;
+            fR.x = 0;
+            fR.y = 0;
+            fR.z = 0;
         }
             
         //Add to overall forces

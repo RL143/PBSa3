@@ -152,7 +152,7 @@ This function returns the total potential energy of the system. */
         rij = nbr[k].rij;
         size_t i = nbr[k].i;
         size_t j = nbr[k].j;
-        if (sqrt(rij.sq) < r_cutsq)
+        if (rij.sq < r_cutsq)
         // Compute forces if the distance is smaller than the cutoff distance
         {
             //Load maximum repulsion parameter

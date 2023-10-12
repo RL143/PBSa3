@@ -19,7 +19,7 @@ double calculate_forces(struct Parameters *p_parameters, struct Nbrlist *p_nbrli
     //calculate_forces_bond(p_parameters, p_vectors);
     //Epot += calculate_forces_angle(p_parameters, p_vectors);
     //Epot += calculate_forces_dihedral(p_parameters, p_vectors);
-    Epot += calculate_forces_nb(p_parameters, p_nbrlist, p_vectors);
+    Epot += calculate_forces_dpd(p_parameters, p_nbrlist, p_vectors);
     return Epot;
 }
 
@@ -126,7 +126,7 @@ double calculate_forces_dihedral(struct Parameters *p_parameters, struct Vectors
 }
 
 
-double calculate_forces_nb(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
+double calculate_forces_dpd(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 /* Compute non-bonded forces on particles using the pairs in a neighbor list.
 This function returns the total potential energy of the system. */
 {
@@ -154,7 +154,11 @@ This function returns the total potential energy of the system. */
         // Compute forces if the distance is smaller than the cutoff distance
         {
             //Load maximum repulsion parameter
-            aij = p_parameters->aij;
+            if (p_vectors->type[i]==p_vectors->type[j]){
+            aij = p_parameters->aii;
+            }else{
+            aij = p_parameters->aij;  
+            }
             
             //Storing reoccuring calculations as factors in double
             Fc= aij*(1-sqrt(rij.sq))/sqrt(rij.sq);

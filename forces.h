@@ -19,7 +19,7 @@ double calculate_forces(struct Parameters *p_parameters, struct Nbrlist *p_nbrli
  * @param[out] p_vectors used members: f
  * @return double potential energy
  */
-double calculate_forces_nb(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors);
+double calculate_forces_dpd(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors);
 
 /**
  * @brief Calculate bond-stretch forces on paricles

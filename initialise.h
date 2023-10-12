@@ -2,6 +2,7 @@
 #define INITIALISE_H_
 
 
+void initialise_types(struct Parameters *p_parameters, struct Vectors *p_vectors);
 /**
  * @brief Initialise_bond_connectivity defines what particles are connected by bonds. This function is called by initialise_structure
  * 

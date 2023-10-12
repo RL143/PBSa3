@@ -30,7 +30,8 @@ struct Parameters
     //double sigma;            //!< LJ particle diameter
     double r_cut;            //!< Cut-off distance for LJ interaction
     double r_shell;          //!< Shell thickness for neighbor list
-    double aij;              //!< Maximum repulsion
+    double aii;              //!< Maximum repulsion same type
+    double aij;              //!< Maximum repulsion different type
     double gamma;
     double sigma;
     size_t num_dt_pdb;       //!< Number of time steps between pdb saves

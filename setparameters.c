@@ -15,16 +15,17 @@ void set_parameters(struct Parameters *p_parameters)
   //p_parameters->sigma = 1.0;                                //LJ particle diameter
 
 // The parameters below control core functionalities of the code, but many values will need to be changed
-  p_parameters->num_part = 2000;                            //number of particles
+  p_parameters->num_part = 3840;                            //number of particles
   p_parameters->num_dt_steps = 2000;                        //number of time steps
   p_parameters->exclude_12_nb = 1;                          // 1-2 connected atoms exluded from non-bonded interactions 
   p_parameters->exclude_13_nb = 1;                          // 1-3 connected atoms exluded from non-bonded interactions    
   p_parameters->dt = 0.01;                                  //integration time step
-  p_parameters->L = (struct Vec3D){14.938, 14.938, 14.938}; //box size
+  p_parameters->L = (struct Vec3D){20, 8, 8}; //box size
     p_parameters->r_cut = 1;                              //cut-off distance used for neigbor list
-  p_parameters->r_shell = 0.4;                              //shell thickness for neighbor list
-  p_parameters->num_dt_pdb = 500;                           //number of time steps in between pdb outputs
-  p_parameters->aij = 25;
+  p_parameters->r_shell = 0.1;                              //shell thickness for neighbor list
+  p_parameters->num_dt_pdb = 5;                           //number of time steps in between pdb outputs
+  p_parameters->aii = 25;
+  p_parameters->aij = 37;
   p_parameters->gamma = 4.5;
   p_parameters->sigma = 3.0;
   strcpy(p_parameters->filename_pdb, "trajectories");       //filename (without extension) for pdb file

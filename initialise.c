@@ -9,7 +9,13 @@
 void initialise_types(struct Parameters *p_parameters, struct Vectors *p_vectors)
 {
     for (size_t i = 0; i < p_parameters->num_part; i++)
-        p_vectors->type[i] = 0; // Specify particle type
+    
+        if (p_vectors->r[i].x<(0.5*p_parameters->L.x)){
+            p_vectors->type[i] = 0; // Specify particle type A
+        }
+        else{
+            p_vectors->type[i] = 1; // Specify particle type B
+        }
 }
 
 void initialise_bond_connectivity(struct Parameters *p_parameters, struct Vectors *p_vectors)
@@ -167,6 +173,7 @@ void initialise(struct Parameters *p_parameters, struct Vectors *p_vectors, stru
     srand(13); // Positive integer as seed for random number generator
     initialise_positions(p_parameters, p_vectors);
     initialise_velocities(p_parameters, p_vectors);
+    initialise_types(p_parameters, p_vectors);
     *p_step = 0;   // Initialize the step as zero
     *p_time = 0.0; // Initialize the time to zero
     return;

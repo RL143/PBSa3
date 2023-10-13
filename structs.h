@@ -27,12 +27,9 @@ struct Parameters
     double kT;               //!< Thermal energy
     double mass;             //!< Mass of a particle
     double epsilon;          //!< LJ interaction strength
-    //double sigma;            //!< LJ particle diameter
     double r_cut;            //!< Cut-off distance for LJ interaction
     double r_shell;          //!< Shell thickness for neighbor list
     
-    double aii;              //!< Maximum repulsion same type
-    double aij;              //!< Maximum repulsion different type
     double gamma;
     double sigma;
     double rho;     

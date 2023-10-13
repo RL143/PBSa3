@@ -1,5 +1,4 @@
 /* Overall changes for all forces are implemented here*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -11,7 +10,6 @@
 
 double calculate_forces(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 {
-    // double Epot = 0;
     struct Vec3D *f = p_vectors->f;
     size_t num_part = p_parameters->num_part;
     for (size_t i = 0; i < num_part; i++)
@@ -21,25 +19,22 @@ double calculate_forces(struct Parameters *p_parameters, struct Nbrlist *p_nbrli
     double Epot = calculate_conservative_force(p_parameters, p_nbrlist, p_vectors);
     calculate_dissipative_force(p_parameters, p_nbrlist, p_vectors);
     calculate_random_force(p_parameters, p_nbrlist, p_vectors);
-    //Epot += calculate_spring_force(p_parameters, p_nbrlist, p_vectors);
+    Epot += calculate_spring_force(p_parameters, p_nbrlist, p_vectors);
     return Epot;
 }
 
 double calculate_conservative_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 {
-    struct Vec3D fC, fD, fR;
-    double r_cutsq, sigmasq, fr, prefctr, a,  aij, Fc, Fd, Fr;
+    struct Vec3D fC;
+    double r_cutsq,  a, Fc;
     struct DeltaR rij;
     struct Pair *nbr = p_nbrlist->nbr;
     const size_t num_nbrs = p_nbrlist->num_nbrs;
     struct Vec3D *f = p_vectors->f;
     size_t num_part = p_parameters->num_part;
+    double Epot = 0.0;
 
     r_cutsq = p_parameters->r_cut * p_parameters->r_cut;
-    sigmasq = p_parameters->sigma * p_parameters->sigma;
-    double epsilon = p_parameters->epsilon;
-
-    double Epot = 0.0;
 
     for (size_t k = 0; k < num_nbrs; k++)
     {
@@ -61,32 +56,12 @@ double calculate_conservative_force(struct Parameters *p_parameters, struct Nbrl
                 a = p_parameters->a_AB;
             
             //Storing reoccuring calculations as factors in double
-            //Fc= aij*(1-sqrt(rij.sq))/sqrt(rij.sq);
             Fc= a*(1-sqrt(rij.sq))/sqrt(rij.sq);
-            //Fd= -p_parameters->gamma*pow(1-sqrt(rij.sq),2);
-            //Fr= p_parameters->sigma*(1-sqrt(rij.sq))*(1/sqrt(p_parameters->dt))*generate_uniform_random();
 
             //Calculate conservative force in the x,y and z directions
             fC.x = Fc* rij.x;
             fC.y = Fc* rij.y;
             fC.z = Fc* rij.z;
-            
-            //Calculate the dissipative force in the x,y and z directions
-            //fD.x = Fd *(rij.x/sqrt(rij.sq)*(p_vectors->v[i].x-p_vectors->v[j].x))*(rij.x/sqrt(rij.sq));
-            //fD.y = Fd *(rij.y/sqrt(rij.sq)*(p_vectors->v[i].y-p_vectors->v[j].y))*(rij.y/sqrt(rij.sq));
-            //fD.z = Fd *(rij.z/sqrt(rij.sq)*(p_vectors->v[i].z-p_vectors->v[j].z))*(rij.z/sqrt(rij.sq));
-
-            //Calculate the random force in the x,y and z directions
-            //fR.x = Fr*(rij.x/sqrt(rij.sq));
-            //fR.y = Fr*(rij.y/sqrt(rij.sq));
-            //fR.z = Fr*(rij.z/sqrt(rij.sq));
-
-            /*f[i].x += fC.x + fD.x + fR.x;
-            f[i].y += fC.y + fD.y + fR.y;
-            f[i].z += fC.z + fD.z + fR.z;
-            f[j].x -= fC.x + fD.x + fR.x;
-            f[j].y -= fC.y + fD.y + fR.y;
-            f[j].z -= fC.z + fD.z + fR.z;*/
 
             f[i].x += fC.x;
             f[i].y += fC.y;
@@ -95,7 +70,7 @@ double calculate_conservative_force(struct Parameters *p_parameters, struct Nbrl
             f[j].y -= fC.y;
             f[j].z -= fC.z;
 
-            //Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq - aij/2;
+            //Epot += -a*sqrt(rij.sq) + 0.5* a* rij.sq - a/2;
             Epot += a * p_parameters->r_cut / 2.0 * (1 - sqrt(rij.sq) / p_parameters->r_cut) * (1 - sqrt(rij.sq) / p_parameters->r_cut);
         }
     }
@@ -104,19 +79,17 @@ double calculate_conservative_force(struct Parameters *p_parameters, struct Nbrl
 
 double calculate_dissipative_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 {
-    struct Vec3D fC, fD, fR;
-    double r_cutsq, sigmasq, fr, prefctr, a,  aij, Fc, Fd, Fr;
+    struct Vec3D fD;
+    double r_cutsq, Fd;
     struct DeltaR rij;
     struct Pair *nbr = p_nbrlist->nbr;
     const size_t num_nbrs = p_nbrlist->num_nbrs;
     struct Vec3D *f = p_vectors->f;
     size_t num_part = p_parameters->num_part;
+    double Epot = 0.0;
+    double gamma = p_parameters->gamma;
 
     r_cutsq = p_parameters->r_cut * p_parameters->r_cut;
-    sigmasq = p_parameters->sigma * p_parameters->sigma;
-    double epsilon = p_parameters->epsilon;
-
-    double Epot = 0.0;
 
     for (size_t k = 0; k < num_nbrs; k++)
     {
@@ -128,7 +101,7 @@ double calculate_dissipative_force(struct Parameters *p_parameters, struct Nbrli
         // Compute forces if the distance is smaller than the cutoff distance
         {
             //Storing reoccuring calculations as factors in double
-            Fd = -p_parameters->gamma*pow(1-sqrt(rij.sq),2);
+            Fd = -gamma*pow(1-sqrt(rij.sq),2);
 
             //Calculate the dissipative force in the x,y and z directions
             fD.x = Fd *(rij.x/sqrt(rij.sq)*(p_vectors->v[i].x-p_vectors->v[j].x))*(rij.x/sqrt(rij.sq));
@@ -147,19 +120,17 @@ double calculate_dissipative_force(struct Parameters *p_parameters, struct Nbrli
 
 double calculate_random_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 {
-    struct Vec3D fC, fD, fR;
-    double r_cutsq, sigmasq, fr, prefctr, a,  aij, Fc, Fd, Fr;
+    struct Vec3D fR;
+    double r_cutsq, Fr;
     struct DeltaR rij;
     struct Pair *nbr = p_nbrlist->nbr;
     const size_t num_nbrs = p_nbrlist->num_nbrs;
     struct Vec3D *f = p_vectors->f;
     size_t num_part = p_parameters->num_part;
+    double Epot = 0.0;
+    double sigma = p_parameters->sigma;
 
     r_cutsq = p_parameters->r_cut * p_parameters->r_cut;
-    sigmasq = p_parameters->sigma * p_parameters->sigma;
-    double epsilon = p_parameters->epsilon;
-
-    double Epot = 0.0;
 
     for (size_t k = 0; k < num_nbrs; k++)
     {
@@ -171,7 +142,7 @@ double calculate_random_force(struct Parameters *p_parameters, struct Nbrlist *p
         // Compute forces if the distance is smaller than the cutoff distance
         {
             //Storing reoccuring calculations as factors in double
-            Fr = p_parameters->sigma*(1-sqrt(rij.sq))*(1/sqrt(p_parameters->dt))*generate_uniform_random();
+            Fr = sigma*(1-sqrt(rij.sq))*(1/sqrt(p_parameters->dt))*generate_uniform_random();
 
             //Calculate the random force in the x,y and z directions
             fR.x = Fr*(rij.x/sqrt(rij.sq));
@@ -185,32 +156,23 @@ double calculate_random_force(struct Parameters *p_parameters, struct Nbrlist *p
             f[j].y -= fR.y;
             f[j].z -= fR.z;
         }
-
     }
 }
 
 double calculate_spring_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
-{
-    double Epot = 0;
+{ 
     struct Bond *bonds = p_vectors->bonds;
     size_t num_bonds = p_vectors->num_bonds;
     struct Vec3D *f = p_vectors->f;
     struct Vec3D *r = p_vectors->r;
-    struct Vec3D L = p_parameters->L;
     int C = p_parameters->c;
     struct Vec3D rij;
     struct Vec3D fS = {0};
+    double Epot = 0.0;
     for (size_t q = 0; q < num_bonds; ++q)
     {
         size_t i = bonds[q].i;
         size_t j = bonds[q].j;
-
-        rij.x = r[i].x - r[j].x;
-        rij.x = rij.x - L.x * floor(rij.x / L.x + 0.5); // apply minimum image convenction for bonded particles
-        rij.y = r[i].y - r[j].y;
-        rij.y = rij.y - L.y * floor(rij.y / L.y + 0.5);
-        rij.z = r[i].z - r[j].z;
-        rij.z = rij.z - L.z * floor(rij.z / L.z + 0.5);
 
         fS.x = -C * rij.x;
         fS.y = -C * rij.y;

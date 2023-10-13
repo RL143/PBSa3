@@ -1,5 +1,5 @@
-/* Initialise_types is adapted'
-    initialise_bond_connectivity is adapted for the bead chain*/
+/* initialise_types is adapted'
+initialise_bond_connectivity is adapted for the bead chain*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -10,16 +10,19 @@
 
 void initialise_types(struct Parameters *p_parameters, struct Vectors *p_vectors)
 {
-    if (p_parameters->num_partA != 0)
-    {
-        for (size_t i = 0; i < p_parameters->num_partA; i++)
-            p_vectors->type[i] = 0; // Specify particle type
-    }
-    if (p_parameters->num_partB != 0)
-    {
-        for (size_t j = 0; j < p_parameters->num_partB; j++)
-            p_vectors->type[p_parameters->num_partA + j] = 1; // Specify particle type
-    }
+
+    for (size_t i = 0; i < p_parameters->num_part; i++)
+        //p_vectors->type[i] = 0; // Specify particle type      // Uncomment to check if the types work!
+        if (p_vectors->r[i].x<(0.5*p_parameters->L.x))
+        {
+            for (size_t i = 0; i < p_parameters->num_partA; i++)
+            p_vectors->type[i] = 0; // Specify particle type A
+        }
+        else
+        {
+            for (size_t j = 0; j < p_parameters->num_partB; j++)
+            p_vectors->type[i] = 1; // Specify particle type B
+        }
 }
 
 void initialise_bond_connectivity(struct Parameters *p_parameters, struct Vectors *p_vectors)
@@ -218,42 +221,6 @@ void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vec
                 p_vectors->r[ipart].x = (i + 0.5) * dr.x;
                 p_vectors->r[ipart].y = (j + 0.5) * dr.y;
                 p_vectors->r[ipart].z = (k + 0.5) * dr.z;
-                //      p_vectors->r[ipart].x = p_parameters->L.x*generate_uniform_random();
-                //      p_vectors->r[ipart].y = p_parameters->L.y*generate_uniform_random();
-                //      p_vectors->r[ipart].z = p_parameters->L.z*generate_uniform_random();
-                /*if (ipart >= p_parameters->num_partA / p_parameters->N_A + p_parameters->num_partB / p_parameters->N_B)
-                    break;
-                else if (ipart < p_parameters->num_partA / p_parameters->N_A)
-                {
-                    p_vectors->r[ipart * p_parameters->N_A].x = (i + 0.5) * dr.x;
-                    p_vectors->r[ipart * p_parameters->N_A].y = (j + 0.5) * dr.y;
-                    p_vectors->r[ipart * p_parameters->N_A].z = (k + 0.5) * dr.z;
-
-                    if (p_parameters->N_A > 1)
-                    {
-                        for (int chain = 1; chain < p_parameters->N_A; chain++)
-                        {
-                            p_vectors->r[ipart * p_parameters->N_A + chain].x = p_vectors->r[ipart * p_parameters->N_A].x - 0.5 * dr.x + generate_uniform_random() * dr.x;
-                            p_vectors->r[ipart * p_parameters->N_A + chain].y = p_vectors->r[ipart * p_parameters->N_A].y - 0.5 * dr.y + generate_uniform_random() * dr.y;
-                            p_vectors->r[ipart * p_parameters->N_A + chain].z = p_vectors->r[ipart * p_parameters->N_A].z - 0.5 * dr.z + generate_uniform_random() * dr.z;
-                        }
-                    }
-                }
-                else
-                {
-                    p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].x = (i + 1 + 0.5) * dr.x;
-                    p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].y = (j + 0.5) * dr.y;
-                    p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].z = (k + 0.5) * dr.z;
-                    if (p_parameters->N_B > 1)
-                    {
-                        for (int chain = 1; chain < p_parameters->N_B; chain++)
-                        {
-                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].x = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].x - 0.5 * dr.x + generate_uniform_random() * dr.x;
-                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].y = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].y - 0.5 * dr.y + generate_uniform_random() * dr.y;
-                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].z = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].z - 0.5 * dr.z + generate_uniform_random() * dr.z;
-                        }
-                    }
-                }*/
             }
 }
 

@@ -19,7 +19,6 @@ double calculate_forces(struct Parameters *p_parameters, struct Nbrlist *p_nbrli
  * @param[out] p_vectors used members: f
  * @return double potential energy
  */
-double calculate_forces_dpd(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors);
 
 /**
  * @brief Calculate bond-stretch forces on paricles
@@ -44,5 +43,14 @@ double calculate_forces_angle(struct Parameters *p_parameters, struct Vectors *p
  * @return double potential energy
  */
 double calculate_forces_dihedral(struct Parameters *p_parameters, struct Vectors *p_vectors);
+
+double calculate_conservative_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors);
+
+double calculate_dissipative_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors);
+
+double calculate_random_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors);
+
+double calculate_spring_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors);
+
 
 #endif /* FORCES_H_ */

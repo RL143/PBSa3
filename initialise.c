@@ -1,3 +1,5 @@
+/* Initialise_types is adapted'
+    initialise_bond_connectivity is adapted for the bead chain*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -8,24 +10,33 @@
 
 void initialise_types(struct Parameters *p_parameters, struct Vectors *p_vectors)
 {
-    for (size_t i = 0; i < p_parameters->num_part; i++)
-    
-        if (p_vectors->r[i].x<(0.5*p_parameters->L.x)){
-            p_vectors->type[i] = 0; // Specify particle type A
-        }
-        else{
-            p_vectors->type[i] = 1; // Specify particle type B
-        }
+    if (p_parameters->num_partA != 0)
+    {
+        for (size_t i = 0; i < p_parameters->num_partA; i++)
+            p_vectors->type[i] = 0; // Specify particle type
+    }
+    if (p_parameters->num_partB != 0)
+    {
+        for (size_t j = 0; j < p_parameters->num_partB; j++)
+            p_vectors->type[p_parameters->num_partA + j] = 1; // Specify particle type
+    }
 }
 
 void initialise_bond_connectivity(struct Parameters *p_parameters, struct Vectors *p_vectors)
 {
-    size_t num_bonds = 0;
+    int chain_length = (p_parameters->num_part / p_parameters->num_chains);
+    size_t num_bonds = (chain_length - 1) * p_parameters->num_chains;
     struct Bond *bonds = (struct Bond *)malloc(num_bonds * sizeof(struct Bond));
 
-    /* 
-        Provide code to specify bonds as pairs of particles: bond[k].i and bond[k].j
-    */
+    /* Loop below added*/
+    for (int k = 0; k < p_parameters->num_chains; k++)
+        {
+            for (int q = 0; q < chain_length - 1; q++)
+            {
+                bonds[k * chain_length + q - k].i = k * chain_length + q;
+                bonds[k * chain_length + q - k].j = k * chain_length + q + 1;
+            }
+        }
 
     p_vectors->num_bonds = num_bonds;
     p_vectors->bonds = bonds;
@@ -189,6 +200,7 @@ void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vec
     double dl;
     int ipart;
 
+    //dl = pow(p_parameters->L.x * p_parameters->L.y * p_parameters->L.z / ((double)p_parameters->num_partA / (double)p_parameters->N_A + (double)p_parameters->num_partB / (double)p_parameters->N_B), 1.0 / 3.0);
     dl = pow(p_parameters->L.x * p_parameters->L.y * p_parameters->L.z / ((double)p_parameters->num_part), 1.0 / 3.0);
     n.i = (int)ceil(p_parameters->L.x / dl);
     n.j = (int)ceil(p_parameters->L.y / dl);
@@ -209,6 +221,39 @@ void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vec
                 //      p_vectors->r[ipart].x = p_parameters->L.x*generate_uniform_random();
                 //      p_vectors->r[ipart].y = p_parameters->L.y*generate_uniform_random();
                 //      p_vectors->r[ipart].z = p_parameters->L.z*generate_uniform_random();
+                /*if (ipart >= p_parameters->num_partA / p_parameters->N_A + p_parameters->num_partB / p_parameters->N_B)
+                    break;
+                else if (ipart < p_parameters->num_partA / p_parameters->N_A)
+                {
+                    p_vectors->r[ipart * p_parameters->N_A].x = (i + 0.5) * dr.x;
+                    p_vectors->r[ipart * p_parameters->N_A].y = (j + 0.5) * dr.y;
+                    p_vectors->r[ipart * p_parameters->N_A].z = (k + 0.5) * dr.z;
+
+                    if (p_parameters->N_A > 1)
+                    {
+                        for (int chain = 1; chain < p_parameters->N_A; chain++)
+                        {
+                            p_vectors->r[ipart * p_parameters->N_A + chain].x = p_vectors->r[ipart * p_parameters->N_A].x - 0.5 * dr.x + generate_uniform_random() * dr.x;
+                            p_vectors->r[ipart * p_parameters->N_A + chain].y = p_vectors->r[ipart * p_parameters->N_A].y - 0.5 * dr.y + generate_uniform_random() * dr.y;
+                            p_vectors->r[ipart * p_parameters->N_A + chain].z = p_vectors->r[ipart * p_parameters->N_A].z - 0.5 * dr.z + generate_uniform_random() * dr.z;
+                        }
+                    }
+                }
+                else
+                {
+                    p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].x = (i + 1 + 0.5) * dr.x;
+                    p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].y = (j + 0.5) * dr.y;
+                    p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].z = (k + 0.5) * dr.z;
+                    if (p_parameters->N_B > 1)
+                    {
+                        for (int chain = 1; chain < p_parameters->N_B; chain++)
+                        {
+                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].x = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].x - 0.5 * dr.x + generate_uniform_random() * dr.x;
+                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].y = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].y - 0.5 * dr.y + generate_uniform_random() * dr.y;
+                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].z = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].z - 0.5 * dr.z + generate_uniform_random() * dr.z;
+                        }
+                    }
+                }*/
             }
 }
 

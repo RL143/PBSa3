@@ -15,19 +15,32 @@ void set_parameters(struct Parameters *p_parameters)
   //p_parameters->sigma = 1.0;                                //LJ particle diameter
 
 // The parameters below control core functionalities of the code, but many values will need to be changed
-  p_parameters->num_part = 3840;                            //number of particles
+  //p_parameters->num_part = 3840;                            //number of particles
   p_parameters->num_dt_steps = 2000;                        //number of time steps
-  p_parameters->exclude_12_nb = 1;                          // 1-2 connected atoms exluded from non-bonded interactions 
-  p_parameters->exclude_13_nb = 1;                          // 1-3 connected atoms exluded from non-bonded interactions    
-  p_parameters->dt = 0.01;                                  //integration time step
+  p_parameters->exclude_12_nb = 0;                          // 1-2 connected atoms exluded from non-bonded interactions 
+  p_parameters->exclude_13_nb = 0;                          // 1-3 connected atoms exluded from non-bonded interactions    
+  p_parameters->dt = 0.04;                                  //integration time step
   p_parameters->L = (struct Vec3D){20, 8, 8}; //box size
     p_parameters->r_cut = 1;                              //cut-off distance used for neigbor list
-  p_parameters->r_shell = 0.1;                              //shell thickness for neighbor list
+  p_parameters->r_shell = 0.4;                              //shell thickness for neighbor list
   p_parameters->num_dt_pdb = 5;                           //number of time steps in between pdb outputs
   p_parameters->aii = 25;
   p_parameters->aij = 37;
   p_parameters->gamma = 4.5;
   p_parameters->sigma = 3.0;
+
+  p_parameters->rho = 3.0;     // density of the system
+  p_parameters->a_AA = 25;
+  p_parameters->a_BB = 25; // maximum repulsion
+  p_parameters->a_AB = 37;//25.5;
+  p_parameters->c = 2;
+  p_parameters->num_partA = 1920;                                             // number of A particles
+  p_parameters->num_partB = 1920;                                             // number of B particles
+  p_parameters->num_part = p_parameters->num_partA + p_parameters->num_partB; // total number of particles
+  p_parameters->N_A = 8;                                                      // Number of particles A per chain
+  p_parameters->N_B = 8;                                                      // Number of particles B per chain
+  p_parameters->num_chains = p_parameters->num_part / p_parameters->N_A;      // number of chains
+
   strcpy(p_parameters->filename_pdb, "trajectories");       //filename (without extension) for pdb file
   p_parameters->rescale_output = 1;                         //factor used to rescale output lengthscale (Most visualisation programs identify bonds based on distances of order 1)
   p_parameters->load_restart = 0;                           //if equal 1 restart file is loaded

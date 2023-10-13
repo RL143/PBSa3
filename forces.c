@@ -1,3 +1,5 @@
+/* Overall changes for all forces are implemented here*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -9,129 +11,24 @@
 
 double calculate_forces(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 {
+    // double Epot = 0;
     struct Vec3D *f = p_vectors->f;
     size_t num_part = p_parameters->num_part;
     for (size_t i = 0; i < num_part; i++)
-        // initialize the forces to zero
+        // Initialize the forces to zero
         f[i] = (struct Vec3D){0.0, 0.0, 0.0}; /*initialize forces to zero*/
 
-    double Epot = 0;
-    //calculate_forces_bond(p_parameters, p_vectors);
-    //Epot += calculate_forces_angle(p_parameters, p_vectors);
-    //Epot += calculate_forces_dihedral(p_parameters, p_vectors);
-    Epot += calculate_forces_dpd(p_parameters, p_nbrlist, p_vectors);
+    double Epot = calculate_conservative_force(p_parameters, p_nbrlist, p_vectors);
+    calculate_dissipative_force(p_parameters, p_nbrlist, p_vectors);
+    calculate_random_force(p_parameters, p_nbrlist, p_vectors);
+    //Epot += calculate_spring_force(p_parameters, p_nbrlist, p_vectors);
     return Epot;
 }
 
-double calculate_forces_bond(struct Parameters *p_parameters, struct Vectors *p_vectors)
-{
-    double Epot = 0;
-    struct Bond * bonds = p_vectors->bonds;
-    size_t num_bonds = p_vectors->num_bonds;
-    struct Vec3D *f = p_vectors->f;
-    struct Vec3D *r = p_vectors->r;
-    struct Vec3D L = p_parameters->L;
-    struct Vec3D rij;
-    struct Vec3D fi={0};
-    for(size_t q = 0; q < num_bonds; ++q)
-    {
-        size_t i = bonds[q].i;
-        size_t j = bonds[q].j;
-
-        rij.x = r[i].x - r[j].x;
-        rij.x = rij.x - L.x*floor(rij.x/L.x+0.5); //apply minimum image convenction for bonded particles
-        rij.y = r[i].y - r[j].y;
-        rij.y = rij.y - L.y*floor(rij.y/L.y+0.5); 
-        rij.z = r[i].z - r[j].z;
-        rij.z = rij.z - L.z*floor(rij.z/L.z+0.5);
-
-        /*
-            Here provide the force calculation
-        */
-
-        f[i].x += fi.x;
-        f[i].y += fi.y;
-        f[i].z += fi.z;
-        f[j].x -= fi.x;
-        f[j].y -= fi.y;
-        f[j].z -= fi.z;
-    }
-    return Epot;
-}
-
-double calculate_forces_angle(struct Parameters *p_parameters, struct Vectors *p_vectors)
-{
-    double Epot = 0;
-    struct Angle * angles = p_vectors->angles;
-    size_t num_angles = p_vectors->num_angles;
-    struct Vec3D *f = p_vectors->f;
-    struct Vec3D *r = p_vectors->r;
-    struct Vec3D L = p_parameters->L;
-    struct Vec3D rij, rkj;
-    struct Vec3D fi={0}, fk={0};
-    for(size_t q = 0; q < num_angles; ++q)
-    {
-        size_t i = angles[q].i;
-        size_t j = angles[q].j;
-        size_t k = angles[q].k;
-
-        rij.x = r[i].x - r[j].x;
-        rij.x = rij.x - L.x*floor(rij.x/L.x+0.5); //apply minimum image convenction for bonded particles
-        rij.y = r[i].y - r[j].y;
-        rij.y = rij.y - L.y*floor(rij.y/L.y+0.5); 
-        rij.z = r[i].z - r[j].z;
-        rij.z = rij.z - L.z*floor(rij.z/L.z+0.5);
-
-        rkj.x = r[k].x - r[j].x;
-        rkj.x = rkj.x - L.x*floor(rkj.x/L.x+0.5); //apply minimum image convenction for bonded particles
-        rkj.y = r[k].y - r[j].y;
-        rkj.y = rkj.y - L.y*floor(rkj.y/L.y+0.5); 
-        rkj.z = r[k].z - r[j].z;
-        rkj.z = rkj.z - L.z*floor(rkj.z/L.z+0.5);
-
-        /*
-            Here provide the force calculation
-        */
-
-        f[i].x += fi.x;
-        f[i].y += fi.y;
-        f[i].z += fi.z;
-        f[j].x -= (fi.x + fk.x);
-        f[j].y -= (fi.y + fk.y);
-        f[j].z -= (fi.z + fk.z);
-        f[k].x += fk.x;
-        f[k].y += fk.y;
-        f[k].z += fk.z;
-    }
-    return Epot;
-}
-
-double calculate_forces_dihedral(struct Parameters *p_parameters, struct Vectors *p_vectors)
-{
-    double Epot = 0;
-    struct Dihedral * dihedrals = p_vectors->dihedrals;
-    size_t num_dihedrals = p_vectors->num_dihedrals;
-    struct Vec3D *f = p_vectors->f;
-    struct Vec3D *r = p_vectors->r;
-    struct Vec3D L = p_parameters->L;
-    for(size_t q = 0; q < num_dihedrals; ++q)
-    {
-        size_t i = dihedrals[q].i;
-        size_t j = dihedrals[q].j;
-        size_t k = dihedrals[q].k;
-        size_t l = dihedrals[q].l;
-
-    }
-    return Epot;
-}
-
-
-double calculate_forces_dpd(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
-/* Compute non-bonded forces on particles using the pairs in a neighbor list.
-This function returns the total potential energy of the system. */
+double calculate_conservative_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 {
     struct Vec3D fC, fD, fR;
-    double r_cutsq, sigmasq, sr2, sr6, sr12, fr, prefctr, aij, Fc, Fd, Fr;
+    double r_cutsq, sigmasq, fr, prefctr, a,  aij, Fc, Fd, Fr;
     struct DeltaR rij;
     struct Pair *nbr = p_nbrlist->nbr;
     const size_t num_nbrs = p_nbrlist->num_nbrs;
@@ -154,16 +51,20 @@ This function returns the total potential energy of the system. */
         // Compute forces if the distance is smaller than the cutoff distance
         {
             //Load maximum repulsion parameter
-            if (p_vectors->type[i]==p_vectors->type[j]){
-            aij = p_parameters->aii;
-            }else{
-            aij = p_parameters->aij;  
+            if (p_vectors->type[i] == 0 && p_vectors->type[j] == 0)
+            {
+                a = p_parameters->a_AA;
             }
+            else if (p_vectors->type[i] == 1 && p_vectors->type[j] == 1)
+                a = p_parameters->a_BB;
+            else
+                a = p_parameters->a_AB;
             
             //Storing reoccuring calculations as factors in double
-            Fc= aij*(1-sqrt(rij.sq))/sqrt(rij.sq);
-            Fd= -p_parameters->gamma*pow(1-sqrt(rij.sq),2);
-            Fr= p_parameters->sigma*(1-sqrt(rij.sq))*(1/sqrt(p_parameters->dt))*generate_uniform_random();
+            //Fc= aij*(1-sqrt(rij.sq))/sqrt(rij.sq);
+            Fc= a*(1-sqrt(rij.sq))/sqrt(rij.sq);
+            //Fd= -p_parameters->gamma*pow(1-sqrt(rij.sq),2);
+            //Fr= p_parameters->sigma*(1-sqrt(rij.sq))*(1/sqrt(p_parameters->dt))*generate_uniform_random();
 
             //Calculate conservative force in the x,y and z directions
             fC.x = Fc* rij.x;
@@ -171,25 +72,160 @@ This function returns the total potential energy of the system. */
             fC.z = Fc* rij.z;
             
             //Calculate the dissipative force in the x,y and z directions
+            //fD.x = Fd *(rij.x/sqrt(rij.sq)*(p_vectors->v[i].x-p_vectors->v[j].x))*(rij.x/sqrt(rij.sq));
+            //fD.y = Fd *(rij.y/sqrt(rij.sq)*(p_vectors->v[i].y-p_vectors->v[j].y))*(rij.y/sqrt(rij.sq));
+            //fD.z = Fd *(rij.z/sqrt(rij.sq)*(p_vectors->v[i].z-p_vectors->v[j].z))*(rij.z/sqrt(rij.sq));
+
+            //Calculate the random force in the x,y and z directions
+            //fR.x = Fr*(rij.x/sqrt(rij.sq));
+            //fR.y = Fr*(rij.y/sqrt(rij.sq));
+            //fR.z = Fr*(rij.z/sqrt(rij.sq));
+
+            /*f[i].x += fC.x + fD.x + fR.x;
+            f[i].y += fC.y + fD.y + fR.y;
+            f[i].z += fC.z + fD.z + fR.z;
+            f[j].x -= fC.x + fD.x + fR.x;
+            f[j].y -= fC.y + fD.y + fR.y;
+            f[j].z -= fC.z + fD.z + fR.z;*/
+
+            f[i].x += fC.x;
+            f[i].y += fC.y;
+            f[i].z += fC.z;
+            f[j].x -= fC.x;
+            f[j].y -= fC.y;
+            f[j].z -= fC.z;
+
+            //Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq - aij/2;
+            Epot += a * p_parameters->r_cut / 2.0 * (1 - sqrt(rij.sq) / p_parameters->r_cut) * (1 - sqrt(rij.sq) / p_parameters->r_cut);
+        }
+    }
+    return Epot;
+}
+
+double calculate_dissipative_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
+{
+    struct Vec3D fC, fD, fR;
+    double r_cutsq, sigmasq, fr, prefctr, a,  aij, Fc, Fd, Fr;
+    struct DeltaR rij;
+    struct Pair *nbr = p_nbrlist->nbr;
+    const size_t num_nbrs = p_nbrlist->num_nbrs;
+    struct Vec3D *f = p_vectors->f;
+    size_t num_part = p_parameters->num_part;
+
+    r_cutsq = p_parameters->r_cut * p_parameters->r_cut;
+    sigmasq = p_parameters->sigma * p_parameters->sigma;
+    double epsilon = p_parameters->epsilon;
+
+    double Epot = 0.0;
+
+    for (size_t k = 0; k < num_nbrs; k++)
+    {
+        // for each pair in the neighbor list compute the pair forces
+        rij = nbr[k].rij;
+        size_t i = nbr[k].i;
+        size_t j = nbr[k].j;
+        if (rij.sq < r_cutsq)
+        // Compute forces if the distance is smaller than the cutoff distance
+        {
+            //Storing reoccuring calculations as factors in double
+            Fd = -p_parameters->gamma*pow(1-sqrt(rij.sq),2);
+
+            //Calculate the dissipative force in the x,y and z directions
             fD.x = Fd *(rij.x/sqrt(rij.sq)*(p_vectors->v[i].x-p_vectors->v[j].x))*(rij.x/sqrt(rij.sq));
             fD.y = Fd *(rij.y/sqrt(rij.sq)*(p_vectors->v[i].y-p_vectors->v[j].y))*(rij.y/sqrt(rij.sq));
             fD.z = Fd *(rij.z/sqrt(rij.sq)*(p_vectors->v[i].z-p_vectors->v[j].z))*(rij.z/sqrt(rij.sq));
+
+            f[i].x += fD.x;
+            f[i].y += fD.y;
+            f[i].z += fD.z;
+            f[j].x -= fD.x;
+            f[j].y -= fD.y;
+            f[j].z -= fD.z;
+        }
+    }
+}
+
+double calculate_random_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
+{
+    struct Vec3D fC, fD, fR;
+    double r_cutsq, sigmasq, fr, prefctr, a,  aij, Fc, Fd, Fr;
+    struct DeltaR rij;
+    struct Pair *nbr = p_nbrlist->nbr;
+    const size_t num_nbrs = p_nbrlist->num_nbrs;
+    struct Vec3D *f = p_vectors->f;
+    size_t num_part = p_parameters->num_part;
+
+    r_cutsq = p_parameters->r_cut * p_parameters->r_cut;
+    sigmasq = p_parameters->sigma * p_parameters->sigma;
+    double epsilon = p_parameters->epsilon;
+
+    double Epot = 0.0;
+
+    for (size_t k = 0; k < num_nbrs; k++)
+    {
+        // for each pair in the neighbor list compute the pair forces
+        rij = nbr[k].rij;
+        size_t i = nbr[k].i;
+        size_t j = nbr[k].j;
+        if (rij.sq < r_cutsq)
+        // Compute forces if the distance is smaller than the cutoff distance
+        {
+            //Storing reoccuring calculations as factors in double
+            Fr = p_parameters->sigma*(1-sqrt(rij.sq))*(1/sqrt(p_parameters->dt))*generate_uniform_random();
 
             //Calculate the random force in the x,y and z directions
             fR.x = Fr*(rij.x/sqrt(rij.sq));
             fR.y = Fr*(rij.y/sqrt(rij.sq));
             fR.z = Fr*(rij.z/sqrt(rij.sq));
 
-            f[i].x += fC.x + fD.x + fR.x;
-            f[i].y += fC.y + fD.y + fR.y;
-            f[i].z += fC.z + fD.z + fR.z;
-            f[j].x -= fC.x + fD.x + fR.x;
-            f[j].y -= fC.y + fD.y + fR.y;
-            f[j].z -= fC.z + fD.z + fR.z;
-
-            Epot += -aij*sqrt(rij.sq) + 0.5* aij* rij.sq - aij/2;
+            f[i].x += fR.x;
+            f[i].y += fR.y;
+            f[i].z += fR.z;
+            f[j].x -= fR.x;
+            f[j].y -= fR.y;
+            f[j].z -= fR.z;
         }
 
+    }
+}
+
+double calculate_spring_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
+{
+    double Epot = 0;
+    struct Bond *bonds = p_vectors->bonds;
+    size_t num_bonds = p_vectors->num_bonds;
+    struct Vec3D *f = p_vectors->f;
+    struct Vec3D *r = p_vectors->r;
+    struct Vec3D L = p_parameters->L;
+    int C = p_parameters->c;
+    struct Vec3D rij;
+    struct Vec3D fS = {0};
+    for (size_t q = 0; q < num_bonds; ++q)
+    {
+        size_t i = bonds[q].i;
+        size_t j = bonds[q].j;
+
+        rij.x = r[i].x - r[j].x;
+        rij.x = rij.x - L.x * floor(rij.x / L.x + 0.5); // apply minimum image convenction for bonded particles
+        rij.y = r[i].y - r[j].y;
+        rij.y = rij.y - L.y * floor(rij.y / L.y + 0.5);
+        rij.z = r[i].z - r[j].z;
+        rij.z = rij.z - L.z * floor(rij.z / L.z + 0.5);
+
+        fS.x = -C * rij.x;
+        fS.y = -C * rij.y;
+        fS.z = -C * rij.z;
+
+        Epot += 0.5 * fS.x * rij.x;
+        Epot += 0.5 * fS.y * rij.y;
+        Epot += 0.5 * fS.z * rij.z;
+
+        f[i].x += fS.x;
+        f[i].y += fS.y;
+        f[i].z += fS.z;
+        f[j].x -= fS.x;
+        f[j].y -= fS.y;
+        f[j].z -= fS.z;
     }
     return Epot;
 }

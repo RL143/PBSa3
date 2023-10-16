@@ -17,8 +17,8 @@ double calculate_forces(struct Parameters *p_parameters, struct Nbrlist *p_nbrli
         f[i] = (struct Vec3D){0.0, 0.0, 0.0}; /*initialize forces to zero*/
 
     double Epot = calculate_conservative_force(p_parameters, p_nbrlist, p_vectors);
-    calculate_dissipative_force(p_parameters, p_nbrlist, p_vectors);
-    calculate_random_force(p_parameters, p_nbrlist, p_vectors);
+    //calculate_dissipative_force(p_parameters, p_nbrlist, p_vectors);
+    //calculate_random_force(p_parameters, p_nbrlist, p_vectors);
     Epot += calculate_spring_force(p_parameters, p_nbrlist, p_vectors);
     return Epot;
 }
@@ -70,14 +70,14 @@ double calculate_conservative_force(struct Parameters *p_parameters, struct Nbrl
             f[j].y -= fC.y;
             f[j].z -= fC.z;
 
-            //Epot += -a*sqrt(rij.sq) + 0.5* a* rij.sq - a/2;
-            Epot += a * p_parameters->r_cut / 2.0 * (1 - sqrt(rij.sq) / p_parameters->r_cut) * (1 - sqrt(rij.sq) / p_parameters->r_cut);
+            Epot += -a*sqrt(rij.sq) + 0.5* a* rij.sq - a/2;
+            //Epot += a * p_parameters->r_cut / 2.0 * (1 - sqrt(rij.sq) / p_parameters->r_cut) * (1 - sqrt(rij.sq) / p_parameters->r_cut);
         }
     }
     return Epot;
 }
 
-double calculate_dissipative_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
+/*double calculate_dissipative_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 {
     struct Vec3D fD;
     double r_cutsq, Fd;
@@ -116,9 +116,9 @@ double calculate_dissipative_force(struct Parameters *p_parameters, struct Nbrli
             f[j].z -= fD.z;
         }
     }
-}
+}*/
 
-double calculate_random_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
+/*double calculate_random_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 {
     struct Vec3D fR;
     double r_cutsq, Fr;
@@ -157,7 +157,7 @@ double calculate_random_force(struct Parameters *p_parameters, struct Nbrlist *p
             f[j].z -= fR.z;
         }
     }
-}
+}*/
 
 double calculate_spring_force(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, struct Vectors *p_vectors)
 { 

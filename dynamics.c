@@ -59,7 +59,108 @@ void boundary_conditions(struct Parameters *p_parameters, struct Vectors *p_vect
     }
 }
 
-void thermostat(struct Parameters *p_parameters, struct Vectors *p_vectors, double Ekin)
-/* Change velocities by thermostatting */
+
+/*Additional code for verifications*/
+void histogram_generation(struct Parameters *p_parameters, struct Vectors *p_vectors, double *bin, double binsize, int num_bins)
+/* generate histogram of velocity profile*/
 {
+    int bin_number;
+    for (int m = 0; m < p_parameters->num_part; m++)
+    {
+        double vx = p_vectors->v[m].x;
+        double vy = p_vectors->v[m].y;
+        double vz = p_vectors->v[m].z;
+
+        double magnitude = sqrt(vx * vx + vy * vy + vz * vz);
+        bin_number = floor(magnitude / binsize);
+
+        if (bin_number < num_bins)
+            if (bin_number > 0)
+                bin[bin_number] += 1;
+    }
 }
+
+void Radial_distribution_function(struct Parameters *p_parameters, struct Vectors *p_vectors, double dbin)
+{
+    int i = 0, j = 0;
+    double ibin;
+    struct Vec3D *r = p_vectors->r; // position
+    struct Vec3D rij;
+    struct Vec3D L = p_parameters->L;
+    double rijabs;
+
+    // Updating
+    for (i = 0; i < (p_parameters->num_part - 1); i++)
+    {
+        for (j = i + 1; j < p_parameters->num_part; j++)
+        {
+            // Distance between the particles for each coordinate
+            rij.x = r[i].x - r[j].x;
+            rij.y = r[i].y - r[j].y;
+            rij.z = r[i].z - r[j].z;
+
+            // Apply periodic boundary condition for each coordinate
+            rij.x = rij.x - L.x * floor((rij.x / L.x) + 0.5);
+            rij.y = rij.y - L.y * floor((rij.y / L.y) + 0.5);
+            rij.z = rij.z - L.z * floor((rij.z / L.z) + 0.5);
+
+            rijabs = sqrt((rij.x * rij.x) + (rij.y * rij.y) + (rij.z * rij.z));
+
+            ibin = floor(rijabs / dbin);
+
+            if (ibin < Nbins_density)
+            {
+                p_vectors->grbin[(int)ibin] += 2.0;
+            }
+        }
+    }
+    p_parameters->grcount += 1.0;
+}
+
+
+/*void density_function(struct Parameters *p_parameters, struct Vectors *p_vectors, size_t step)
+{
+    struct Vec3D L = p_parameters->L;
+    double Maxbin = L.x; // measure positions between 0 and L.x
+    int id;
+    double binwidth = Maxbin / ((double)Nbins_density);
+    double chi;
+    struct Vec3D *r = p_vectors->r; 
+
+    for (int i = 0; i < p_parameters->num_part; i++)
+    {
+        id = floor(r[i].x / binwidth);
+
+        if (0 <= id && id < Nbins_density) // Assigning the particles A and B to different density
+        {
+            if (p_vectors->type[i] == 0)
+                p_vectors->DAbin[id] += 1.0;
+            else if (p_vectors->type[i] == 1)
+                p_vectors->DBbin[id] += 1.0;
+            else
+                printf("type is not defined.\n");
+        }
+    }
+    p_parameters->counter += 1.0;
+
+    if (step == p_parameters->num_dt_steps) // Call once at end of simulation
+    {
+        FILE *density = NULL;
+        density = fopen("density.csv", "a+");
+        if (density == NULL)
+        {
+            printf("Filecouldnotopencorrectly\n");
+            exit(1);
+        }
+
+        for (int i = 0; i < Nbins_density; i++) // Density and chi calculation
+        {
+            p_vectors->DAbin[i] = p_vectors->DAbin[i] / (p_parameters->counter * binwidth * L.y * L.z * (double)p_parameters->N_A);
+            p_vectors->DBbin[i] = p_vectors->DBbin[i] / (p_parameters->counter * binwidth * L.y * L.z * (double)p_parameters->N_B);
+            double phi_A = p_vectors->DAbin[i] / (p_vectors->DAbin[i] + p_vectors->DBbin[i]);
+            chi = log((1.0 - phi_A) / phi_A) / (p_parameters->N_A * (1.0 - 2.0 * phi_A));
+            fprintf(density, "%lf %lf %lf %lf %lf \n", ((double)i + 0.5) * binwidth, p_vectors->DAbin[i], p_vectors->DBbin[i], p_vectors->DAbin[i] + p_vectors->DBbin[i], chi);
+        }
+        fclose(density);
+    }
+}*/

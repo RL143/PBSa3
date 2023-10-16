@@ -1,21 +1,24 @@
+close all
+clear
+
 % Load data from CSV file
-data = csvread('Energy_time.csv', 1, 0);
+data = csvread('EC_conservative.csv', 1, 0);
 
 % Extract columns
-Step = data(:,1);
-Time = data(:,2);
-Epot = data(:,3);
-Ekin = data(:,4);
-Etot = data(:,5);
+%Step = data(:,1);
+Time = data(:,1);
+Epot = data(:,2);
+Ekin = data(:,3);
+Etot = data(:,4);
 
 % Plot energies over time
 figure;
-plot(Time, Epot, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Epot');
+plot(Time, Epot,  'DisplayName', 'Epot');%'r-', 'LineWidth', 1.5,
 hold on;
-plot(Time, Ekin, 'b-', 'LineWidth', 1.5, 'DisplayName', 'Ekin');
-plot(Time, Etot, 'g-', 'LineWidth', 1.5, 'DisplayName', 'Etot');
-xlabel('Time');
-ylabel('Energy');
+plot(Time, Ekin,  'DisplayName', 'Ekin');%'b-', 'LineWidth', 1.5,
+plot(Time, Etot,  'DisplayName', 'Etot');%'g-', 'LineWidth', 1.5,
+xlabel('Time [S]');
+ylabel('Energy [kT]');
 title('Energies over Time');
 legend('Location', 'Best');
 grid on;

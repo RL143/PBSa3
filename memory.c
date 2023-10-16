@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "structs.h"
 #include "nbrlist.h"
+#include "constants.h"
 
 void alloc_vectors(struct Vectors *p_vectors, size_t sz)
 /* Allocate the arrays in 'vectors' needed to store information of all particles */
@@ -18,6 +19,9 @@ void alloc_vectors(struct Vectors *p_vectors, size_t sz)
     p_vectors->num_angles = 0;
     p_vectors->dihedrals = NULL;
     p_vectors->num_dihedrals = 0;
+    p_vectors->grbin = (double *)malloc(Nbins_radial * sizeof(double));
+    p_vectors->DAbin = (double *)malloc(Nbins_radial * sizeof(double));
+    p_vectors->DBbin = (double *)malloc(Nbins_radial * sizeof(double));
 }
 
 void free_vectors(struct Vectors *p_vectors)
@@ -43,6 +47,12 @@ void free_vectors(struct Vectors *p_vectors)
     p_vectors->num_bonds = 0;
     p_vectors->num_angles = 0;
     p_vectors->num_dihedrals = 0;
+    free(p_vectors->grbin);
+    p_vectors->grbin = NULL;
+    free(p_vectors->DAbin);
+    p_vectors->DAbin = NULL;
+    free(p_vectors->DBbin);
+    p_vectors->DBbin = NULL;
 }
 
 void alloc_memory(struct Parameters *p_parameters, struct Vectors *p_vectors, struct Nbrlist *p_nbrlist)

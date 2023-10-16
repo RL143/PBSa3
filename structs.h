@@ -41,7 +41,10 @@ struct Parameters
     size_t num_partB;                                            
     int N_A;                                                      
     int N_B;                                                      
-    double num_chains;      
+    double num_chains; 
+    double grcount;     
+    double counter;
+    char rad_filename[1024];
 
     size_t num_dt_pdb;       //!< Number of time steps between pdb saves
     double rescale_output;   //!< Rescale factor for outputted positions
@@ -128,6 +131,9 @@ struct Vectors
     struct Bond *bonds;         //!< bonds
     struct Angle *angles;       //!< angles
     struct Dihedral *dihedrals; //!< dihedrals
+    double *grbin;
+    double *DAbin;
+    double *DBbin;
 };
 
 /**

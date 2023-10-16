@@ -14,11 +14,11 @@ void set_parameters(struct Parameters *p_parameters)
   p_parameters->epsilon = 1.0;                              //LJ interaction strength
 
 // The parameters below control core functionalities of the code, but many values will need to be changed
-  p_parameters->num_dt_steps = 2000;                        //number of time steps
+  p_parameters->num_dt_steps = 1000;                        //number of time steps
   p_parameters->exclude_12_nb = 0;                          // 1-2 connected atoms exluded from non-bonded interactions 
   p_parameters->exclude_13_nb = 0;                          // 1-3 connected atoms exluded from non-bonded interactions    
   p_parameters->dt = 0.04;                                  //integration time step
-  p_parameters->L = (struct Vec3D){20, 8, 8}; //box size
+  p_parameters->L = (struct Vec3D){8, 8, 20};//{14.938, 14.938, 14.938};// //box size
     p_parameters->r_cut = 1;                              //cut-off distance used for neigbor list
   p_parameters->r_shell = 0.4;                              //shell thickness for neighbor list
   p_parameters->num_dt_pdb = 5;                           //number of time steps in between pdb outputs
@@ -33,9 +33,12 @@ void set_parameters(struct Parameters *p_parameters)
   p_parameters->num_partA = 1920;                                             // number of A particles
   p_parameters->num_partB = 1920;                                             // number of B particles
   p_parameters->num_part = p_parameters->num_partA + p_parameters->num_partB; // total number of particles
-  p_parameters->N_A = 8;                                                      // Number of particles A per chain
-  p_parameters->N_B = 8;                                                      // Number of particles B per chain
+  p_parameters->N_A = 1;                                                      // Number of particles A per chain
+  p_parameters->N_B = 1;                                                      // Number of particles B per chain
   p_parameters->num_chains = p_parameters->num_part / p_parameters->N_A;      // number of chains
+  p_parameters->grcount = 0.0;
+  p_parameters->counter = 0.0;
+  strcpy(p_parameters->rad_filename, "radial_distribution.txt");
 
   strcpy(p_parameters->filename_pdb, "trajectories");       //filename (without extension) for pdb file
   p_parameters->rescale_output = 1;                         //factor used to rescale output lengthscale (Most visualisation programs identify bonds based on distances of order 1)

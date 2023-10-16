@@ -184,18 +184,18 @@ int main(void)
 
         if (step > 3 * parameters.num_dt_steps / 4)
         {
-                Radial_distribution_function(&parameters, &vectors, dbin);
-                //density_function(&parameters, &vectors, step);
+            Radial_distribution_function(&parameters, &vectors, dbin);
+            //density_function(&parameters, &vectors, step);
         }
-        //if (step % parameters.num_dt_pdb == 0)
-        //    record_trajectories_pdb(0, &parameters, &vectors, time);
-        //if (step % parameters.num_dt_restart == 0)
+        if (step % parameters.num_dt_pdb == 0)
+            record_trajectories_pdb(0, &parameters, &vectors, time);
+        if (step % parameters.num_dt_restart == 0)
             save_restart(&parameters, &vectors);
         if (step > 3 * parameters.num_dt_steps / 4)
             histogram_generation(&parameters, &vectors, bin, binsize, num_bin);
             printf("Step %zu, Time %f, Epot %f, Ekin %f, Etot %f\n", step, time, Epot, Ekin, Epot + Ekin);
-        //if (step % parameters.num_dt_pdb == 0)
-        //    record_trajectories_pdb(0, &parameters, &vectors, time);
+        if (step % parameters.num_dt_pdb == 0)
+            record_trajectories_pdb(0, &parameters, &vectors, time);
         if (step % parameters.num_dt_restart == 0)
             save_restart(&parameters, &vectors);
         EC = fopen("Energy.csv", "a+");

@@ -87,12 +87,13 @@ void Radial_distribution_function(struct Parameters *p_parameters, struct Vector
     struct Vec3D *r = p_vectors->r; // position
     struct Vec3D rij;
     struct Vec3D L = p_parameters->L;
-    double rijabs;
+    double rijabs_sq; 
+    double dbin_sq = dbin * dbin; 
 
     // Updating
     for (i = 0; i < (p_parameters->num_part - 1); i++)
     {
-        for (j = i + 1; j < p_parameters->num_part; j++)
+        for (j = i + 1; j < p_parameters->num_part; j++)    
         {
             // Distance between the particles for each coordinate
             rij.x = r[i].x - r[j].x;
@@ -104,12 +105,11 @@ void Radial_distribution_function(struct Parameters *p_parameters, struct Vector
             rij.y = rij.y - L.y * floor((rij.y / L.y) + 0.5);
             rij.z = rij.z - L.z * floor((rij.z / L.z) + 0.5);
 
-            rijabs = sqrt((rij.x * rij.x) + (rij.y * rij.y) + (rij.z * rij.z));
+            rijabs_sq = (rij.x * rij.x) + (rij.y * rij.y) + (rij.z * rij.z);
 
-            ibin = floor(rijabs / dbin);
-
-            if (ibin < Nbins_density)
+            if (rijabs_sq < dbin_sq)
             {
+                ibin = floor(sqrt(rijabs_sq) / dbin);
                 p_vectors->grbin[(int)ibin] += 2.0;
             }
         }

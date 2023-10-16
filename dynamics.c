@@ -79,7 +79,7 @@ void histogram_generation(struct Parameters *p_parameters, struct Vectors *p_vec
                 bin[bin_number] += 1;
     }
 }
-
+/*
 void Radial_distribution_function(struct Parameters *p_parameters, struct Vectors *p_vectors, double dbin)
 {
     int i = 0, j = 0;
@@ -115,6 +115,35 @@ void Radial_distribution_function(struct Parameters *p_parameters, struct Vector
         }
     }
     p_parameters->grcount += 1.0;
+}*/
+
+
+void Radial_distribution_function(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, double *rdf, double dr)
+{
+    size_t num_part = p_parameters->num_part;
+    double volume = p_parameters->L.x * p_parameters->L.y * p_parameters->L.z;
+
+    for (size_t i = 0; i < num_part; ++i)
+    {
+        for (size_t j = 0; j < p_nbrlist->num_nbrs; ++j)
+        {
+            double r = sqrt(p_nbrlist->nbr[j].rij.sq);
+
+            if (r < p_parameters->r_cut)
+            {
+                size_t bin = (size_t)(r / dr);
+                rdf[bin] += 2.0; // Factor of 2 to account for pairs (i, j) and (j, i)
+            }
+        }
+    }
+/*
+    // Normalize RDF
+    for (size_t i = 0; i < num_part; ++i)
+    {
+        double r = (i + 0.5) * dr;
+        double shell_volume = 4.0 / 3.0 * PI * (pow(r + dr, 3) - pow(r, 3));
+        rdf[i] /= (shell_volume * num_part * volume);
+    }*/
 }
 
 

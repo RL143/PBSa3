@@ -15,7 +15,7 @@ double calculate_forces(struct Parameters *p_parameters, struct Nbrlist *p_nbrli
     for (size_t i = 0; i < num_part; i++)
         // Initialize the forces to zero
         f[i] = (struct Vec3D){0.0, 0.0, 0.0}; /*initialize forces to zero*/
-
+    //double Epot = 0;    // initialize for only non-concervative forces
     double Epot = calculate_conservative_force(p_parameters, p_nbrlist, p_vectors);
     calculate_dissipative_force(p_parameters, p_nbrlist, p_vectors);
     calculate_random_force(p_parameters, p_nbrlist, p_vectors);
@@ -71,7 +71,6 @@ double calculate_conservative_force(struct Parameters *p_parameters, struct Nbrl
             f[j].z -= fC.z;
 
             Epot += -a*sqrt(rij.sq) + 0.5* a* rij.sq - a/2;
-            //Epot += a * p_parameters->r_cut / 2.0 * (1 - sqrt(rij.sq) / p_parameters->r_cut) * (1 - sqrt(rij.sq) / p_parameters->r_cut);
         }
     }
     return Epot;

@@ -36,19 +36,6 @@
 #include "dynamics.h"
 #include "memory.h"
 #include "fileoutput.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include "constants.h"
-#include "structs.h"
-#include "setparameters.h"
-#include "initialise.h"
-#include "nbrlist.h"
-#include "forces.h"
-#include "dynamics.h"
-#include "memory.h"
-#include "fileoutput.h"
 // #include "density.h"
 
 /**
@@ -64,13 +51,13 @@ int main(void)
     struct Nbrlist nbrlist;
     size_t step;
     double Ekin, Epot, time;
-    FILE *EC = NULL;
-    FILE *hist = NULL;
+    FILE *Energy = NULL;
+    FILE *histogram = NULL;
     FILE *RDF = NULL;
     int num_bin = 100;
     double bin[num_bin]; // Number of bins for the simulation
     for (int i = 0; i < num_bin; ++i)
-        bin[i] = 0.0;
+        bin[i] = 0.0;  
 
     set_parameters(&parameters);
     alloc_memory(&parameters, &vectors, &nbrlist);
@@ -108,7 +95,7 @@ int main(void)
         update_nbrlist(&parameters, &vectors, &nbrlist);
         Epot = calculate_forces(&parameters, &nbrlist, &vectors);
         Ekin = update_velocities_half_dt(&parameters, &nbrlist, &vectors);
-
+        
         if (step > 3 * parameters.num_dt_steps / 4){
             Radial_distribution_function(&parameters, &vectors, dbin);
             density_function(&parameters, &vectors, step);
@@ -124,29 +111,28 @@ int main(void)
             record_trajectories_pdb(0, &parameters, &vectors, time);
         if (step % parameters.num_dt_restart == 0)
             save_restart(&parameters, &vectors);
-
-        EC = fopen("Energy.csv", "a+");
-        if (EC == NULL){
+        Energy = fopen("Energy.csv", "a+");
+        if (Energy == NULL){
             printf("Filecouldnotopencorrectly\n");
             exit(1);
         }
-        fprintf(EC, "%E, %E, %E, %E\n", time, Epot, Ekin, Epot + Ekin);
-        fclose(EC);
+        fprintf(Energy, "%E, %E, %E, %E\n", time, Epot, Ekin, Epot + Ekin);
+        fclose(Energy);
     }
 
-    hist = fopen("Histogram.csv", "a+");
-    if (hist == NULL)
+    histogram = fopen("Histogram.csv", "a+");
+    if (histogram == NULL)
     {
         printf("Filecouldnotopencorrectly\n");
         exit(1);
     }
     for (int i = 0; i < num_bin; i++)
-        fprintf(hist, "%d, %E\n", i, bin[i]);
-    fclose(hist);
+        fprintf(histogram, "%d, %E\n", i, bin[i]);
+    fclose(histogram);
 
 
     double volume;
-    double rho_rdf = (parameters.num_part - 1.0) / (L.x * L.y * L.z); // Calculate average particle density (other particles are N-1)
+    double rho_rdf = (parameters.num_part - 1) / (L.x * L.y * L.z); // Calculate average particle density (other particles are N-1)
     double *grbin = vectors.grbin;
   
     RDF = fopen("RDF.csv", "a+");
@@ -158,7 +144,7 @@ int main(void)
     fprintf(RDF, "%f %f\n", 0.0, 0.0);
     for (size_t ibin = 0; ibin < Nbins_radial - 1 ; ibin++)
     {
-        volume = (4.0 / 3.0) * PI * (((ibin + 1) * (ibin + 1) * (ibin + 1)) - (ibin * ibin * ibin)) * (dbin * dbin * dbin);
+        volume = (4.0 / 3.0) * PI * (((ibin + 1) * (ibin + 1) * (ibin + 1)) - (ibin * ibin * ibin)) * (dbin * dbin * dbin); 
         grbin[ibin] = grbin[ibin] / (rho_rdf * volume * parameters.grcount * parameters.num_part);  // Normalization over mass, steps, and particles
         fprintf(RDF, "%f %f\n", ((double)ibin + 0.5) * dbin, grbin[ibin]);
     }

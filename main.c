@@ -97,7 +97,7 @@ int main(void)
         Ekin = update_velocities_half_dt(&parameters, &nbrlist, &vectors);
         
         if (step > 3 * parameters.num_dt_steps / 4){
-            Radial_distribution_function(&parameters, &vectors, dbin);
+          //  Radial_distribution_function(&parameters, &vectors, dbin);
             density_function(&parameters, &vectors, step);
         }
         if (step % parameters.num_dt_pdb == 0)

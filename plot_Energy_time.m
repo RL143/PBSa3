@@ -2,7 +2,7 @@ close all
 clear
 
 % Load data from CSV file
-data = csvread('Energy.csv', 1, 0);
+data = csvread('Energy_Q2_1.csv', 1, 0);
 
 % Extract columns
 %Step = data(:,1);

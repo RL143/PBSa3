@@ -32,9 +32,11 @@ void boundary_conditions(struct Parameters *p_parameters, struct Vectors *p_vect
  * @param[in, out] p_vectors used members: v
  * @param[in] Ekin current kinetic energy
  */
+void thermostat(struct Parameters *p_parameters, struct Vectors *p_vectors, double Ekin);
 
 void histogram_generation(struct Parameters *p_parameters, struct Vectors *p_vectors, double *bin, double binsize, int num_bin);
 void Radial_distribution_function(struct Parameters *p_parameters, struct Vectors *p_vectors, double dbin);
+
 void density_function(struct Parameters *p_parameters, struct Vectors *p_vectors, size_t step);
 
 #endif /* DYNAMICS_H_ */

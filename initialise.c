@@ -187,17 +187,81 @@ void initialise(struct Parameters *p_parameters, struct Vectors *p_vectors, stru
     return;
 }
 
+
 void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vectors)
 /*  Initialize positions of all particles.
-    Particles are initialized on a square lattice.
+    // Particles are initialized on a square lattice.
 */
+{
+    struct Vec3D dr;
+    struct Index3D n;
+    double dl;
+
+    dl = pow(p_parameters->L.x * p_parameters->L.y * p_parameters->L.z / ((double)p_parameters->num_partA / (double)p_parameters->N_A + (double)p_parameters->num_partB / (double)p_parameters->N_B), 1.0 / 3.0);
+    n.i = (int)ceil(p_parameters->L.x / dl);
+    n.j = (int)ceil(p_parameters->L.y / dl);
+    n.k = (int)ceil(p_parameters->L.z / dl);
+
+    dr.x = p_parameters->L.x / (double)n.i;
+    dr.y = p_parameters->L.y / (double)n.j;
+    dr.z = p_parameters->L.z / (double)n.k;
+
+    int ipart = 0;
+
+    for (size_t i = 0; i < n.i; ++i)
+    {
+        for (size_t j = 0; j < n.j; ++j)
+        {
+            for (size_t k = 0; k < n.k; ++k, ++ipart)
+            {
+                if (ipart >= p_parameters->num_partA / p_parameters->N_A + p_parameters->num_partB / p_parameters->N_B)
+                    break;
+                else if (ipart < p_parameters->num_partA / p_parameters->N_A)
+                {
+                    p_vectors->r[ipart * p_parameters->N_A].x = (i + 0.5) * dr.x;
+                    p_vectors->r[ipart * p_parameters->N_A].y = (j + 0.5) * dr.y;
+                    p_vectors->r[ipart * p_parameters->N_A].z = (k + 0.5) * dr.z;
+
+                    if (p_parameters->N_A > 1)
+                    {
+                        for (int chain = 1; chain < p_parameters->N_A; chain++)
+                        {
+                            p_vectors->r[ipart * p_parameters->N_A + chain].x = p_vectors->r[ipart * p_parameters->N_A].x - 0.5 * dr.x + generate_uniform_random() * dr.x;
+                            p_vectors->r[ipart * p_parameters->N_A + chain].y = p_vectors->r[ipart * p_parameters->N_A].y - 0.5 * dr.y + generate_uniform_random() * dr.y;
+                            p_vectors->r[ipart * p_parameters->N_A + chain].z = p_vectors->r[ipart * p_parameters->N_A].z - 0.5 * dr.z + generate_uniform_random() * dr.z;
+                        }
+                    }
+                }
+                else
+                {
+                    p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].x = (i + 1 + 0.5) * dr.x;
+                    p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].y = (j + 0.5) * dr.y;
+                    p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].z = (k + 0.5) * dr.z;
+                    if (p_parameters->N_B > 1)
+                    {
+                        for (int chain = 1; chain < p_parameters->N_B; chain++)
+                        {
+                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].x = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].x - 0.5 * dr.x + generate_uniform_random() * dr.x;
+                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].y = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].y - 0.5 * dr.y + generate_uniform_random() * dr.y;
+                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].z = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].z - 0.5 * dr.z + generate_uniform_random() * dr.z;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+//void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vectors)
+/*  Initialize positions of all particles.
+    Particles are initialized on a square lattice.
+*//*
 {
     struct Vec3D dr;
     struct Index3D n;
     double dl;
     int ipart;
 
-    //dl = pow(p_parameters->L.x * p_parameters->L.y * p_parameters->L.z / ((double)p_parameters->num_partA / (double)p_parameters->N_A + (double)p_parameters->num_partB / (double)p_parameters->N_B), 1.0 / 3.0);
     dl = pow(p_parameters->L.x * p_parameters->L.y * p_parameters->L.z / ((double)p_parameters->num_part), 1.0 / 3.0);
     n.i = (int)ceil(p_parameters->L.x / dl);
     n.j = (int)ceil(p_parameters->L.y / dl);
@@ -216,7 +280,7 @@ void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vec
                 p_vectors->r[ipart].y = (j + 0.5) * dr.y;
                 p_vectors->r[ipart].z = (k + 0.5) * dr.z;
             }
-}
+}*/
 
 void initialise_velocities(struct Parameters *p_parameters, struct Vectors *p_vectors)
 /*  Initialize the velocities of all particles.

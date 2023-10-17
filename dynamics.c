@@ -13,7 +13,7 @@ void update_positions(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist
         dr.y = p_vectors->v[i].y * p_parameters->dt;
         dr.z = p_vectors->v[i].z * p_parameters->dt;
         p_vectors->dr[i] = dr;
-        p_vectors->r[i].x += dr.x; //updating positions
+        p_vectors->r[i].x += dr.x; // updating positions
         p_vectors->r[i].y += dr.y;
         p_vectors->r[i].z += dr.z;
         p_nbrlist->dr[i].x += dr.x; // update displacements with respect to neighbor list creation are updated
@@ -30,7 +30,7 @@ double update_velocities_half_dt(struct Parameters *p_parameters, struct Nbrlist
 */
 {
     double Ekin = 0.0;
-    const double factor = 0.5 * p_parameters->mass * p_parameters->dt;
+    const double factor = 0.5 / p_parameters->mass * p_parameters->dt;
     for (size_t i = 0; i < p_parameters->num_part; i++)
     {
         p_vectors->v[i].x += factor * p_vectors->f[i].x;
@@ -59,8 +59,11 @@ void boundary_conditions(struct Parameters *p_parameters, struct Vectors *p_vect
     }
 }
 
+void thermostat(struct Parameters *p_parameters, struct Vectors *p_vectors, double Ekin)
+/* Change velocities by thermostatting */
+{
+}
 
-/*Additional code for verifications*/
 void histogram_generation(struct Parameters *p_parameters, struct Vectors *p_vectors, double *bin, double binsize, int num_bins)
 /* generate histogram of velocity profile*/
 {
@@ -79,7 +82,7 @@ void histogram_generation(struct Parameters *p_parameters, struct Vectors *p_vec
                 bin[bin_number] += 1;
     }
 }
-/*
+
 void Radial_distribution_function(struct Parameters *p_parameters, struct Vectors *p_vectors, double dbin)
 {
     int i = 0, j = 0;
@@ -87,13 +90,12 @@ void Radial_distribution_function(struct Parameters *p_parameters, struct Vector
     struct Vec3D *r = p_vectors->r; // position
     struct Vec3D rij;
     struct Vec3D L = p_parameters->L;
-    double rijabs_sq; 
-    double dbin_sq = dbin * dbin; 
+    double rijabs;
 
     // Updating
     for (i = 0; i < (p_parameters->num_part - 1); i++)
     {
-        for (j = i + 1; j < p_parameters->num_part; j++)    
+        for (j = i + 1; j < p_parameters->num_part; j++)
         {
             // Distance between the particles for each coordinate
             rij.x = r[i].x - r[j].x;
@@ -105,47 +107,18 @@ void Radial_distribution_function(struct Parameters *p_parameters, struct Vector
             rij.y = rij.y - L.y * floor((rij.y / L.y) + 0.5);
             rij.z = rij.z - L.z * floor((rij.z / L.z) + 0.5);
 
-            rijabs_sq = (rij.x * rij.x) + (rij.y * rij.y) + (rij.z * rij.z);
+            rijabs = sqrt((rij.x * rij.x) + (rij.y * rij.y) + (rij.z * rij.z));
 
-            if (rijabs_sq < dbin_sq)
+            ibin = floor(rijabs / dbin);
+
+            if (ibin < Nbins_density)
             {
-                ibin = floor(sqrt(rijabs_sq) / dbin);
-                p_vectors->grbin[(int)ibin] += 2.0;
+                p_vectors->grbin[(int)ibin] += 2.0;     // +2 for th ij and ji pairs
             }
         }
     }
     p_parameters->grcount += 1.0;
-}*/
-
-
-void Radial_distribution_function(struct Parameters *p_parameters, struct Nbrlist *p_nbrlist, double *rdf, double dr)
-{
-    size_t num_part = p_parameters->num_part;
-    double volume = p_parameters->L.x * p_parameters->L.y * p_parameters->L.z;
-
-    for (size_t i = 0; i < num_part; ++i)
-    {
-        for (size_t j = 0; j < p_nbrlist->num_nbrs; ++j)
-        {
-            double r = sqrt(p_nbrlist->nbr[j].rij.sq);
-
-            if (r < p_parameters->r_cut)
-            {
-                size_t bin = (size_t)(r / dr);
-                rdf[bin] += 2.0; // Factor of 2 to account for pairs (i, j) and (j, i)
-            }
-        }
-    }
-/*
-    // Normalize RDF
-    for (size_t i = 0; i < num_part; ++i)
-    {
-        double r = (i + 0.5) * dr;
-        double shell_volume = 4.0 / 3.0 * PI * (pow(r + dr, 3) - pow(r, 3));
-        rdf[i] /= (shell_volume * num_part * volume);
-    }*/
 }
-
 
 void density_function(struct Parameters *p_parameters, struct Vectors *p_vectors, size_t step)
 {

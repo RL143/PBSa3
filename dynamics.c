@@ -147,7 +147,7 @@ void Radial_distribution_function(struct Parameters *p_parameters, struct Nbrlis
 }
 
 
-/*void density_function(struct Parameters *p_parameters, struct Vectors *p_vectors, size_t step)
+void density_function(struct Parameters *p_parameters, struct Vectors *p_vectors, size_t step)
 {
     struct Vec3D L = p_parameters->L;
     double Maxbin = L.x; // measure positions between 0 and L.x
@@ -192,4 +192,4 @@ void Radial_distribution_function(struct Parameters *p_parameters, struct Nbrlis
         }
         fclose(density);
     }
-}*/
+}

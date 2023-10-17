@@ -10,18 +10,12 @@ initialise_bond_connectivity is adapted for the bead chain*/
 
 void initialise_types(struct Parameters *p_parameters, struct Vectors *p_vectors)
 {
-
-    for (size_t i = 0; i < p_parameters->num_part; i++)
-        //p_vectors->type[i] = 0; // Specify particle type      // Uncomment to check if the types work!
-        if (p_vectors->r[i].x<(0.5*p_parameters->L.x))
-        {
-            for (size_t i = 0; i < p_parameters->num_partA; i++)
-            p_vectors->type[i] = 0; // Specify particle type A
+        for (size_t i = 0; i < p_parameters->num_partA; i++){
+        p_vectors->type[i] = 0; // Specify particle type A
         }
-        else
-        {
-            for (size_t j = 0; j < p_parameters->num_partB; j++)
-            p_vectors->type[i] = 1; // Specify particle type B
+        
+        for (size_t j = 0; j < p_parameters->num_partB; j++){
+        p_vectors->type[p_parameters->num_partA+j] = 1; // Specify particle type B
         }
 }
 

@@ -14,11 +14,11 @@ void set_parameters(struct Parameters *p_parameters)
   p_parameters->epsilon = 1.0;                              //LJ interaction strength
 
 // The parameters below control core functionalities of the code, but many values will need to be changed
-  p_parameters->num_dt_steps = 200;//10000;                        //number of time steps
+  p_parameters->num_dt_steps = 3000;                        //number of time steps
   p_parameters->exclude_12_nb = 0;                          // 1-2 connected atoms exluded from non-bonded interactions 
   p_parameters->exclude_13_nb = 0;                          // 1-3 connected atoms exluded from non-bonded interactions    
   p_parameters->dt = 0.04;                                  //integration time step
-  p_parameters->L = (struct Vec3D){10,10,10};//{8, 8, 20}; //box size
+  p_parameters->L = (struct Vec3D){20,8,8};//{8, 8, 20}; //box size
     p_parameters->r_cut = 1;                              //cut-off distance used for neigbor list
   p_parameters->r_shell = 0.4;                              //shell thickness for neighbor list
   p_parameters->num_dt_pdb = 5;                           //number of time steps in between pdb outputs
@@ -26,12 +26,12 @@ void set_parameters(struct Parameters *p_parameters)
   p_parameters->gamma = 4.5;
   p_parameters->sigma = 3.0;
   p_parameters->rho = 3.0;                      // density of the system
-  p_parameters->a_AA = 25;
-  p_parameters->a_BB = 25;                      // maximum repulsion
-  p_parameters->a_AB = 25;//37;
+  p_parameters->a_AA = 25.0;
+  p_parameters->a_BB = 25.0;                      // maximum repulsion
+  p_parameters->a_AB = 25.0;
   p_parameters->c = 2;
-  p_parameters->num_partA = 2000;//1920;                                             // number of A particles
-  p_parameters->num_partB = 2000;//1920;                                             // number of B particles
+  p_parameters->num_partA = 1920;                                             // number of A particles
+  p_parameters->num_partB = 1920;                                             // number of B particles
   p_parameters->num_part = p_parameters->num_partA + p_parameters->num_partB; // total number of particles
   p_parameters->N_A = 1;                                                      // Number of particles A per chain
   p_parameters->N_B = 1;                                                      // Number of particles B per chain

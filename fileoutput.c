@@ -29,11 +29,13 @@ void record_trajectories_pdb(int reset, struct Parameters *p_parameters, struct 
   fprintf(fp_traj, "CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-10s%-3s\n", rs*p_parameters->L.x, rs*p_parameters->L.y, rs*p_parameters->L.z, 90.0, 90.0, 90.0, "P 1", "1");
   for (size_t i = 0; i < p_parameters->num_part; i++)
   {
-    if (p_vectors->type[i]==0){
-    fprintf(fp_traj, "HETATM %5u  B 1 UNK     1    %7.4f %7.4f %7.4f   1.0   1.0\n", (unsigned int)i % 100000, rs*p_vectors->r[i].x, rs*p_vectors->r[i].y, rs*p_vectors->r[i].z);
-    }
-    if (p_vectors->type[i]==1){
+
+
+    if(p_vectors->type[i] == 0){
     fprintf(fp_traj, "HETATM %5u  C 1 UNK     1    %7.4f %7.4f %7.4f   1.0   1.0\n", (unsigned int)i % 100000, rs*p_vectors->r[i].x, rs*p_vectors->r[i].y, rs*p_vectors->r[i].z);
+    }
+    else if(p_vectors->type[i] ==1){
+    fprintf(fp_traj, "HETATM %5u  N 1 UNK     1    %7.4f %7.4f %7.4f   1.0   1.0\n", (unsigned int)i % 100000, rs*p_vectors->r[i].x, rs*p_vectors->r[i].y, rs*p_vectors->r[i].z);
     }
   }
   fprintf(fp_traj, "ENDMDL\n");

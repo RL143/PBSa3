@@ -43,21 +43,21 @@ void free_vectors(struct Vectors *p_vectors)
     p_vectors->angles = NULL;
     free(p_vectors->dihedrals);
     p_vectors->dihedrals = NULL;
-    p_vectors->size = 0;
-    p_vectors->num_bonds = 0;
-    p_vectors->num_angles = 0;
-    p_vectors->num_dihedrals = 0;
     free(p_vectors->grbin);
     p_vectors->grbin = NULL;
     free(p_vectors->DAbin);
     p_vectors->DAbin = NULL;
     free(p_vectors->DBbin);
     p_vectors->DBbin = NULL;
+    p_vectors->size = 0;
+    p_vectors->num_bonds = 0;
+    p_vectors->num_angles = 0;
+    p_vectors->num_dihedrals = 0;
 }
 
 void alloc_memory(struct Parameters *p_parameters, struct Vectors *p_vectors, struct Nbrlist *p_nbrlist)
 /* Allocate all variables needed in the MD simulation */
-{    
+{
     alloc_vectors(p_vectors, p_parameters->num_part);
     alloc_nbrlist(p_parameters, p_nbrlist);
 }

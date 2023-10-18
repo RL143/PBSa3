@@ -70,7 +70,7 @@ int main(void)
     }
     else
     initialise(&parameters, &vectors, &nbrlist, &step, &time);
-    boundary_conditions(&parameters, &vectors);
+    //boundary_conditions(&parameters, &vectors);       // Only turn this off at n = 1
     build_nbrlist(&parameters, &vectors, &nbrlist);
     
     Epot = calculate_forces(&parameters, &nbrlist, &vectors);
@@ -99,7 +99,7 @@ int main(void)
         Ekin = update_velocities_half_dt(&parameters, &nbrlist, &vectors);
         
         if (step > 3 * parameters.num_dt_steps / 4){
-          //  Radial_distribution_function(&parameters, &vectors, dbin);
+            Radial_distribution_function(&parameters, &vectors, dbin);
             density_function(&parameters, &vectors, step);
         }
         if (step % parameters.num_dt_pdb == 0)

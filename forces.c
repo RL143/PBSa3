@@ -167,6 +167,7 @@ double calculate_spring_force(struct Parameters *p_parameters, struct Nbrlist *p
     size_t num_bonds = p_vectors->num_bonds;
     struct Vec3D *f = p_vectors->f;
     struct Vec3D *r = p_vectors->r;
+    struct Vec3D L = p_parameters->L;
     int C = p_parameters->c;
     struct Vec3D rij;
     struct Vec3D fS = {0};
@@ -176,13 +177,19 @@ double calculate_spring_force(struct Parameters *p_parameters, struct Nbrlist *p
         size_t i = bonds[q].i;
         size_t j = bonds[q].j;
 
+        rij.x = r[i].x - r[j].x;
+        rij.x = rij.x - L.x * floor(rij.x / L.x + 0.5); // apply minimum image convention for bonded particles
+        rij.y = r[i].y - r[j].y;
+        rij.y = rij.y - L.y * floor(rij.y / L.y + 0.5);
+        rij.z = r[i].z - r[j].z;
+        rij.z = rij.z - L.z * floor(rij.z / L.z + 0.5);
+
+        double rij_abs = sqrt(rij.x * rij.x + rij.y * rij.y + rij.z * rij.z);
+        Epot += 0.5 * C * rij_abs * rij_abs;
+
         fS.x = -C * rij.x;
         fS.y = -C * rij.y;
         fS.z = -C * rij.z;
-
-        Epot -= 0.5 * fS.x * rij.x;
-        Epot -= 0.5 * fS.y * rij.y;
-        Epot -= 0.5 * fS.z * rij.z;
 
         f[i].x += fS.x;
         f[i].y += fS.y;

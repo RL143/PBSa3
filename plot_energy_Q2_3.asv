@@ -10,5 +10,5 @@ plot(t, E_pot, t, E_kin, t, E_tot)
 legend('E_{pot}', 'E_{kin}', 'E_{tot}')
 xlabel('Time [s]')
 ylabel('Energy [kT]')
-avg = mean(E_kin(1000:end));
+avg = mean(E_kin(00:end));
 text(50,1000, ['Average E_{kin}: ', num2str(avg), '  kT'])

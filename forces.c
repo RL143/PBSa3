@@ -70,7 +70,7 @@ double calculate_conservative_force(struct Parameters *p_parameters, struct Nbrl
             f[j].y -= fC.y;
             f[j].z -= fC.z;
 
-            Epot += -a*sqrt(rij.sq) + 0.5* a* rij.sq - a/2;
+            Epot += -a*sqrt(rij.sq) + 0.5* a* rij.sq + a/2;
         }
     }
     return Epot;
@@ -100,12 +100,15 @@ double calculate_dissipative_force(struct Parameters *p_parameters, struct Nbrli
         // Compute forces if the distance is smaller than the cutoff distance
         {
             //Storing reoccuring calculations as factors in double
+            double inp = ((p_vectors->v[i].x-p_vectors->v[j].x)*rij.x+(p_vectors->v[i].y-p_vectors->v[j].y)*rij.y
+                            +(p_vectors->v[i].z-p_vectors->v[j].z)*rij.z)/sqrt(rij.sq);
+
             Fd = -gamma*pow(1-sqrt(rij.sq),2);
 
             //Calculate the dissipative force in the x,y and z directions
-            fD.x = Fd *(rij.x/sqrt(rij.sq)*(p_vectors->v[i].x-p_vectors->v[j].x))*(rij.x/sqrt(rij.sq));
-            fD.y = Fd *(rij.y/sqrt(rij.sq)*(p_vectors->v[i].y-p_vectors->v[j].y))*(rij.y/sqrt(rij.sq));
-            fD.z = Fd *(rij.z/sqrt(rij.sq)*(p_vectors->v[i].z-p_vectors->v[j].z))*(rij.z/sqrt(rij.sq));
+            fD.x = Fd *inp*(rij.x/sqrt(rij.sq));
+            fD.y = Fd *inp*(rij.y/sqrt(rij.sq));
+            fD.z = Fd *inp*(rij.z/sqrt(rij.sq));
 
             f[i].x += fD.x;
             f[i].y += fD.y;
@@ -177,9 +180,9 @@ double calculate_spring_force(struct Parameters *p_parameters, struct Nbrlist *p
         fS.y = -C * rij.y;
         fS.z = -C * rij.z;
 
-        Epot += 0.5 * fS.x * rij.x;
-        Epot += 0.5 * fS.y * rij.y;
-        Epot += 0.5 * fS.z * rij.z;
+        Epot -= 0.5 * fS.x * rij.x;
+        Epot -= 0.5 * fS.y * rij.y;
+        Epot -= 0.5 * fS.z * rij.z;
 
         f[i].x += fS.x;
         f[i].y += fS.y;

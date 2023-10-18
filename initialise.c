@@ -21,19 +21,29 @@ void initialise_types(struct Parameters *p_parameters, struct Vectors *p_vectors
 
 void initialise_bond_connectivity(struct Parameters *p_parameters, struct Vectors *p_vectors)
 {
-    int chain_length = (p_parameters->num_part / p_parameters->num_chains);
-    size_t num_bonds = (chain_length - 1) * p_parameters->num_chains;
+    size_t p = 0;
+    size_t q = 0;
+    size_t num_bonds = p_parameters->num_partA / p_parameters->N_A * (p_parameters->N_A - 1) + p_parameters->num_partB / p_parameters->N_B * (p_parameters->N_B - 1);
+
     struct Bond *bonds = (struct Bond *)malloc(num_bonds * sizeof(struct Bond));
 
-    /* Loop below added*/
-    for (int k = 0; k < p_parameters->num_chains; k++)
+    for (p = 0; p < p_parameters->num_partA / p_parameters->N_A; p++)
+    {
+        for (q = 0; q < p_parameters->N_A - 1; q++)
         {
-            for (int q = 0; q < chain_length - 1; q++)
-            {
-                bonds[k * chain_length + q - k].i = k * chain_length + q;
-                bonds[k * chain_length + q - k].j = k * chain_length + q + 1;
-            }
+            bonds[(p_parameters->N_A - 1) * p + q].i = p_parameters->N_A * p + q;
+            bonds[(p_parameters->N_A - 1) * p + q].j = p_parameters->N_A * p + q + 1;
         }
+    }
+    for (p = 0; p < p_parameters->num_partB / p_parameters->N_B; p++)
+    {
+
+        for (q = 0; q < p_parameters->N_B - 1; q++)
+        {
+            bonds[p_parameters->num_partA / p_parameters->N_A * (p_parameters->N_A - 1) + (p_parameters->N_B - 1) * p + q].i = p_parameters->num_partA + p_parameters->N_B * p + q;
+            bonds[p_parameters->num_partA / p_parameters->N_A * (p_parameters->N_A - 1) + (p_parameters->N_B - 1) * p + q].j = p_parameters->num_partA + p_parameters->N_B * p + q + 1;
+        }
+    }
 
     p_vectors->num_bonds = num_bonds;
     p_vectors->bonds = bonds;
@@ -226,9 +236,9 @@ void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vec
                     {
                         for (int chain = 1; chain < p_parameters->N_A; chain++)
                         {
-                            p_vectors->r[ipart * p_parameters->N_A + chain].x = p_vectors->r[ipart * p_parameters->N_A].x - 0.5 * dr.x + generate_uniform_random() * dr.x;
-                            p_vectors->r[ipart * p_parameters->N_A + chain].y = p_vectors->r[ipart * p_parameters->N_A].y - 0.5 * dr.y + generate_uniform_random() * dr.y;
-                            p_vectors->r[ipart * p_parameters->N_A + chain].z = p_vectors->r[ipart * p_parameters->N_A].z - 0.5 * dr.z + generate_uniform_random() * dr.z;
+                            p_vectors->r[ipart * p_parameters->N_A + chain].x = p_vectors->r[ipart * p_parameters->N_A].x - 0.5 * dr.x + generate_uniform_random01() * dr.x;
+                            p_vectors->r[ipart * p_parameters->N_A + chain].y = p_vectors->r[ipart * p_parameters->N_A].y - 0.5 * dr.y + generate_uniform_random01() * dr.y;
+                            p_vectors->r[ipart * p_parameters->N_A + chain].z = p_vectors->r[ipart * p_parameters->N_A].z - 0.5 * dr.z + generate_uniform_random01() * dr.z;
                         }
                     }
                 }
@@ -241,9 +251,9 @@ void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vec
                     {
                         for (int chain = 1; chain < p_parameters->N_B; chain++)
                         {
-                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].x = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].x - 0.5 * dr.x + generate_uniform_random() * dr.x;
-                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].y = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].y - 0.5 * dr.y + generate_uniform_random() * dr.y;
-                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].z = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].z - 0.5 * dr.z + generate_uniform_random() * dr.z;
+                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].x = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].x - 0.5 * dr.x + generate_uniform_random01() * dr.x;
+                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].y = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].y - 0.5 * dr.y + generate_uniform_random01() * dr.y;
+                            p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B + chain].z = p_vectors->r[p_parameters->num_partA + (ipart - p_parameters->num_partA / p_parameters->N_A) * p_parameters->N_B].z - 0.5 * dr.z + generate_uniform_random01() * dr.z;
                         }
                     }
                 }
@@ -251,36 +261,6 @@ void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vec
         }
     }
 }
-
-//void initialise_positions(struct Parameters *p_parameters, struct Vectors *p_vectors)
-/*  Initialize positions of all particles.
-    Particles are initialized on a square lattice.
-*//*
-{
-    struct Vec3D dr;
-    struct Index3D n;
-    double dl;
-    int ipart;
-
-    dl = pow(p_parameters->L.x * p_parameters->L.y * p_parameters->L.z / ((double)p_parameters->num_part), 1.0 / 3.0);
-    n.i = (int)ceil(p_parameters->L.x / dl);
-    n.j = (int)ceil(p_parameters->L.y / dl);
-    n.k = (int)ceil(p_parameters->L.z / dl);
-    dr.x = p_parameters->L.x / (double)n.i;
-    dr.y = p_parameters->L.y / (double)n.j;
-    dr.z = p_parameters->L.z / (double)n.k;
-    ipart = 0;
-    for (size_t i = 0; i < n.i; ++i)
-        for (size_t j = 0; j < n.j; ++j)
-            for (size_t k = 0; k < n.k; ++k, ++ipart)
-            {
-                if (ipart >= p_parameters->num_part)
-                    break;
-                p_vectors->r[ipart].x = (i + 0.5) * dr.x;
-                p_vectors->r[ipart].y = (j + 0.5) * dr.y;
-                p_vectors->r[ipart].z = (k + 0.5) * dr.z;
-            }
-}*/
 
 void initialise_velocities(struct Parameters *p_parameters, struct Vectors *p_vectors)
 /*  Initialize the velocities of all particles.

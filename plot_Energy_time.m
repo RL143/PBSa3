@@ -2,7 +2,7 @@ close all
 clear
 
 % Load data from CSV file
-data = csvread('Energy_Q2_1.csv', 1, 0);
+data = csvread('Energy.csv', 1, 0);
 
 % Extract columns
 %Step = data(:,1);
@@ -13,10 +13,10 @@ Etot = data(:,4);
 
 % Plot energies over time
 figure;
-plot(Time, Epot,  'DisplayName', 'Epot');%'r-', 'LineWidth', 1.5,
+plot(Time, Epot,  'DisplayName', 'Epot');
 hold on;
-plot(Time, Ekin,  'DisplayName', 'Ekin');%'b-', 'LineWidth', 1.5,
-plot(Time, Etot,  'DisplayName', 'Etot');%'g-', 'LineWidth', 1.5,
+plot(Time, Ekin,  'DisplayName', 'Ekin');
+plot(Time, Etot,  'DisplayName', 'Etot');
 xlabel('Time [S]');
 ylabel('Energy [kT]');
 title('Energies over Time');

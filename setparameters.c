@@ -28,13 +28,13 @@ void set_parameters(struct Parameters *p_parameters)
   p_parameters->rho = 3.0;                      // density of the system
   p_parameters->a_AA = 25.0;
   p_parameters->a_BB = 25.0;                      // maximum repulsion
-  p_parameters->a_AB = 43.0;
+  p_parameters->a_AB = 37.0;
   p_parameters->c = 2;
   p_parameters->num_partA = 1920;                                             // number of A particles
   p_parameters->num_partB = 1920;                                             // number of B particles
   p_parameters->num_part = p_parameters->num_partA + p_parameters->num_partB; // total number of particles
-  p_parameters->N_A = 1;                                                      // Number of particles A per chain
-  p_parameters->N_B = 1;                                                      // Number of particles B per chain
+  p_parameters->N_A = 4;                                                      // Number of particles A per chain
+  p_parameters->N_B = 4;                                                      // Number of particles B per chain
   p_parameters->num_chains = p_parameters->num_part / p_parameters->N_A;      // number of chains
   p_parameters->grcount = 0.0;
   p_parameters->counter = 0.0;

@@ -28,7 +28,7 @@ void set_parameters(struct Parameters *p_parameters)
   p_parameters->rho = 3.0;                      // density of the system
   p_parameters->a_AA = 25.0;
   p_parameters->a_BB = 25.0;                      // maximum repulsion
-  p_parameters->a_AB = 43.0;
+  p_parameters->a_AB = 37.0;
   p_parameters->c = 2;
   p_parameters->num_partA = 1920;                                             // number of A particles
   p_parameters->num_partB = 1920;                                             // number of B particles

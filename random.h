@@ -7,6 +7,7 @@
  * @return double random number in (0,1)
  */
 double generate_uniform_random(void);
+double generate_uniform_random01(void);
 
 /**
  * @brief Generate Gaussian distributed random number with mean 0 and standard deviations 1

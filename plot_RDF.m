@@ -1,13 +1,14 @@
 clear
 close all
-M1 = readmatrix('RDF_Q3_1.csv');
-r1 = M1(:,1);
-gr1 = M1(:,2);
+M = readmatrix('RDF_Q3_1.csv');
+r = M(:,1);
+gr = M(:,2);
 
-gr1fit = fit(r1, gr1, 'smoothingspline');
+grfit = fit(r, gr, 'smoothingspline');
 
-plot(gr1fit, r1, gr1)
+plot(grfit, r, gr)
 yline(1, '-.r')
+title("Radial distribution function (Fig 2 replica)")
 xlabel('Distance [r_c]')
 ylabel('g(r)')
 xlim([0 1])

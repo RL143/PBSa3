@@ -1,7 +1,9 @@
 clear all, close all, clc
 
-density = readmatrix("density.csv");
+% loading the density data
+density = readmatrix("density_3000.csv");
 
+% 
 density(:,6) = [];
 
 x_coordinate = density(:,1);
@@ -20,16 +22,3 @@ plot(x_coordinate, data_3)
 legend("Da", "DB", "DA + DB")
 
 hold off
-
-density_3000 = readmatrix("density_3000.csv");
-
-density_3000(:,6) = [];
-
-x_coordinate = density_3000(:,1);
-data_1_3 = density(:,2);
-data_2_3 = density(:,3);
-data_3 = density(:,4);
-data_4 = density(:,5);
-
-figure("Name", "3000")
-

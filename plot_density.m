@@ -1,7 +1,7 @@
 clear all, close all, clc
 
 % loading the density data
-density = readmatrix("density_3000.csv");
+density = readmatrix("density_10000.csv");
 
 x_coordinate = density(:,1);
 data_1 = density(:,2);

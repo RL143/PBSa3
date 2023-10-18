@@ -52,7 +52,7 @@ chi(6,1) = mean(chi_20);
 density_25 = readmatrix("density_25.csv");
 density_25(:,6) = [];
 chi_25 = density_25(:,5);
-chi_25(30:32) = [];
+chi_25(14:20) = [];
 chi(7,1) = mean(chi_25);
 
 %% Fitting a linear line through the origin

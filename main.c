@@ -70,7 +70,9 @@ int main(void)
     }
     else
     initialise(&parameters, &vectors, &nbrlist, &step, &time);
+    boundary_conditions(&parameters, &vectors);
     build_nbrlist(&parameters, &vectors, &nbrlist);
+    
     Epot = calculate_forces(&parameters, &nbrlist, &vectors);
     record_trajectories_pdb(1, &parameters, &vectors, time);
 

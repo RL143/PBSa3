@@ -18,7 +18,7 @@ void set_parameters(struct Parameters *p_parameters)
   p_parameters->exclude_12_nb = 0;                          // 1-2 connected atoms exluded from non-bonded interactions 
   p_parameters->exclude_13_nb = 0;                          // 1-3 connected atoms exluded from non-bonded interactions    
   p_parameters->dt = 0.04;                                  //integration time step
-  p_parameters->L = (struct Vec3D){20,8,8};//{8, 8, 20}; //box size
+  p_parameters->L = (struct Vec3D){20,8,8};                //box size
     p_parameters->r_cut = 1;                              //cut-off distance used for neigbor list
   p_parameters->r_shell = 0.4;                              //shell thickness for neighbor list
   p_parameters->num_dt_pdb = 5;                           //number of time steps in between pdb outputs
